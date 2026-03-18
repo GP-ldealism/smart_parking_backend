@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.gp.smartparking.mapper.BlacklistMapper">
+
+    <resultMap id="BaseResultMap" type="cn.gp.smartparking.domain.entity.Blacklist">
+            <id property="id" column="id" />
+            <result property="plate_number" column="plate_number" />
+            <result property="reason" column="reason" />
+            <result property="expire_time" column="expire_time" />
+            <result property="version" column="version" />
+            <result property="create_by" column="create_by" />
+            <result property="create_time" column="create_time" />
+            <result property="update_by" column="update_by" />
+            <result property="update_time" column="update_time" />
+            <result property="is_deleted" column="is_deleted" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,plate_number,reason,expire_time,version,create_by,
+        create_time,update_by,update_time,is_deleted
+    </sql>
+</mapper>

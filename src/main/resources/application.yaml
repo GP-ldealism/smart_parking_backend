@@ -1,0 +1,25 @@
+server:
+  port: 9003 # 服务端口
+  servlet:
+    context-path: /smart-parking # 接口前缀
+
+spring:
+  application:
+    name: smart-parking-cloud-platform
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/smart_parking?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+
+
+# MyBatis-Plus配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true # 下划线转驼峰
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL日志
+  mapper-locations: classpath:mapper/**/*.xml # Mapper.xml路径
+  type-aliases-package: com.smartparking.domain.entity # 实体类别名包
+
+
