@@ -1,6 +1,6 @@
 package cn.gp.smartparking.mapper;
 
-import cn.gp.smartparking.domain.entity.PaymentRecord;
+import cn.gp.smartparking.model.entity.PaymentRecord;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

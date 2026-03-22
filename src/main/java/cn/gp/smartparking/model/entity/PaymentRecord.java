@@ -1,4 +1,4 @@
-package cn.gp.smartparking.domain.entity;
+package cn.gp.smartparking.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -10,12 +10,12 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 优惠券表
- * @TableName coupon
+ * 支付记录表
+ * @TableName payment_record
  */
-@TableName(value ="coupon")
+@TableName(value ="payment_record")
 @Data
-public class Coupon implements Serializable {
+public class PaymentRecord implements Serializable {
     /**
      * 
      */
@@ -23,59 +23,39 @@ public class Coupon implements Serializable {
     private Long id;
 
     /**
-     * 所属用户（NULL=通用券）
+     * 订单ID
      */
-    private Long user_id;
+    private Long order_id;
 
     /**
-     * 优惠码
+     * 支付流水号
      */
-    private String code;
+    private String payment_no;
 
     /**
-     * 优惠券名称
+     * 支付金额
      */
-    private String name;
+    private BigDecimal amount;
 
     /**
-     * 0=满减 1=折扣 2=时长
+     * 0=微信 1=支付宝 2=余额
      */
-    private Integer type;
+    private Integer payment_method;
 
     /**
-     * 优惠值
+     * 0=待支付 1=成功 2=失败
      */
-    private BigDecimal value;
+    private Integer payment_status;
 
     /**
-     * 最低消费
+     * 第三方交易号
      */
-    private BigDecimal min_amount;
+    private String transaction_id;
 
     /**
-     * 有效期开始
+     * 支付完成时间
      */
-    private Date start_time;
-
-    /**
-     * 有效期结束
-     */
-    private Date end_time;
-
-    /**
-     * 0=未使用 1=已使用 2=已过期
-     */
-    private Integer status;
-
-    /**
-     * 使用时间
-     */
-    private Date used_time;
-
-    /**
-     * 使用订单
-     */
-    private Long used_order_id;
+    private Date payment_time;
 
     /**
      * 乐观锁

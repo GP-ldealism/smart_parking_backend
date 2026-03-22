@@ -1,45 +1,56 @@
-package cn.gp.smartparking.domain.entity;
+package cn.gp.smartparking.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 
 /**
- * 车位信息表
- * @TableName parking_space
+ * 车位历史占用表
+ * @TableName parking_usage_history
  */
-@TableName(value ="parking_space")
+@TableName(value ="parking_usage_history")
 @Data
-public class ParkingSpace implements Serializable {
+public class ParkingUsageHistory implements Serializable {
     /**
-     * 车位ID
+     * 
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 所属停车场ID
+     * 
      */
     private Long parking_lot_id;
 
     /**
-     * 车位编号
+     * 占用率 0-100
      */
-    private String space_no;
+    private BigDecimal occupancy_rate;
 
     /**
-     * 0=普通 1=新能源 2=VIP
+     * 记录时间
      */
-    private Integer type;
+    private Date record_time;
 
     /**
-     * 0=占用 1=空闲
+     * 小时 0-23
      */
-    private Integer status;
+    private Integer hour;
+
+    /**
+     * 星期 1-7
+     */
+    private Integer weekday;
+
+    /**
+     * 是否节假日
+     */
+    private Integer is_holiday;
 
     /**
      * 乐观锁

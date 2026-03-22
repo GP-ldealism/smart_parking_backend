@@ -1,81 +1,45 @@
-package cn.gp.smartparking.domain.entity;
+package cn.gp.smartparking.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 
 /**
- * 停车订单表
- * @TableName parking_order
+ * 系统数据字典
+ * @TableName sys_dict
  */
-@TableName(value ="parking_order")
+@TableName(value ="sys_dict")
 @Data
-public class ParkingOrder implements Serializable {
+public class SysDict implements Serializable {
     /**
-     * 订单ID
+     * 
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 订单号
+     * 字典类型
      */
-    private String order_no;
+    private String dict_type;
 
     /**
-     * 用户ID
+     * 键
      */
-    private Long user_id;
+    private String dict_key;
 
     /**
-     * 停车场ID
+     * 值
      */
-    private Long parking_lot_id;
+    private String dict_value;
 
     /**
-     * 车位号
+     * 排序
      */
-    private String space_no;
-
-    /**
-     * 车牌号
-     */
-    private String plate_number;
-
-    /**
-     * 0=预约 1=停车
-     */
-    private Integer type;
-
-    /**
-     * 开始时间
-     */
-    private Date start_time;
-
-    /**
-     * 结束时间
-     */
-    private Date end_time;
-
-    /**
-     * 停车时长（分钟）
-     */
-    private Integer duration_minutes;
-
-    /**
-     * 金额
-     */
-    private BigDecimal amount;
-
-    /**
-     * 0=待进场 1=已完成 2=已取消
-     */
-    private Integer status;
+    private Integer sort_order;
 
     /**
      * 乐观锁

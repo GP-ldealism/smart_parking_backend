@@ -1,7 +1,7 @@
 package cn.gp.smartparking.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import cn.gp.smartparking.domain.entity.Blacklist;
+import cn.gp.smartparking.model.entity.Blacklist;
 import cn.gp.smartparking.service.BlacklistService;
 import cn.gp.smartparking.mapper.BlacklistMapper;
 import org.springframework.stereotype.Service;

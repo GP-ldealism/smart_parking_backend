@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.gp.smartparking.mapper.SysLogMapper">
 
-    <resultMap id="BaseResultMap" type="cn.gp.smartparking.domain.entity.SysLog">
+    <resultMap id="BaseResultMap" type="cn.gp.smartparking.model.entity.SysLog">
             <id property="id" column="id" />
             <result property="user_id" column="user_id" />
             <result property="content" column="content" />

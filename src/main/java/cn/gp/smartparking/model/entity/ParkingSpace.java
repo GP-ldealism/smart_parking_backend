@@ -1,4 +1,4 @@
-package cn.gp.smartparking.domain.entity;
+package cn.gp.smartparking.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -9,37 +9,37 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 用户停车偏好表
- * @TableName user_preference
+ * 车位信息表
+ * @TableName parking_space
  */
-@TableName(value ="user_preference")
+@TableName(value ="parking_space")
 @Data
-public class UserPreference implements Serializable {
+public class ParkingSpace implements Serializable {
     /**
-     * 
+     * 车位ID
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户ID
+     * 所属停车场ID
      */
-    private Long user_id;
+    private Long parking_lot_id;
 
     /**
-     * 偏好最大距离（米）
+     * 车位编号
      */
-    private Integer prefer_distance;
+    private String space_no;
 
     /**
-     * 0=便宜优先 1=距离优先
+     * 0=普通 1=新能源 2=VIP
      */
-    private Integer prefer_price;
+    private Integer type;
 
     /**
-     * 偏好车位类型
+     * 0=占用 1=空闲
      */
-    private Integer prefer_type;
+    private Integer status;
 
     /**
      * 乐观锁

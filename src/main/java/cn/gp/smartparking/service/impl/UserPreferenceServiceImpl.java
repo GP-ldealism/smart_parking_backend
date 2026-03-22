@@ -1,7 +1,7 @@
 package cn.gp.smartparking.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import cn.gp.smartparking.domain.entity.UserPreference;
+import cn.gp.smartparking.model.entity.UserPreference;
 import cn.gp.smartparking.service.UserPreferenceService;
 import cn.gp.smartparking.mapper.UserPreferenceMapper;
 import org.springframework.stereotype.Service;

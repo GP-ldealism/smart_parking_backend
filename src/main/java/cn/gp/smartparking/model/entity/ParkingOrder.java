@@ -1,4 +1,4 @@
-package cn.gp.smartparking.domain.entity;
+package cn.gp.smartparking.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -10,47 +10,72 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 车位历史占用表
- * @TableName parking_usage_history
+ * 停车订单表
+ * @TableName parking_order
  */
-@TableName(value ="parking_usage_history")
+@TableName(value ="parking_order")
 @Data
-public class ParkingUsageHistory implements Serializable {
+public class ParkingOrder implements Serializable {
     /**
-     * 
+     * 订单ID
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 
+     * 订单号
+     */
+    private String order_no;
+
+    /**
+     * 用户ID
+     */
+    private Long user_id;
+
+    /**
+     * 停车场ID
      */
     private Long parking_lot_id;
 
     /**
-     * 占用率 0-100
+     * 车位号
      */
-    private BigDecimal occupancy_rate;
+    private String space_no;
 
     /**
-     * 记录时间
+     * 车牌号
      */
-    private Date record_time;
+    private String plate_number;
 
     /**
-     * 小时 0-23
+     * 0=预约 1=停车
      */
-    private Integer hour;
+    private Integer type;
 
     /**
-     * 星期 1-7
+     * 开始时间
      */
-    private Integer weekday;
+    private Date start_time;
 
     /**
-     * 是否节假日
+     * 结束时间
      */
-    private Integer is_holiday;
+    private Date end_time;
+
+    /**
+     * 停车时长（分钟）
+     */
+    private Integer duration_minutes;
+
+    /**
+     * 金额
+     */
+    private BigDecimal amount;
+
+    /**
+     * 0=待进场 1=已完成 2=已取消
+     */
+    private Integer status;
 
     /**
      * 乐观锁

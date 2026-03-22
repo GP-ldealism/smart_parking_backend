@@ -1,6 +1,6 @@
 package cn.gp.smartparking.mapper;
 
-import cn.gp.smartparking.domain.entity.SysLog;
+import cn.gp.smartparking.model.entity.SysLog;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

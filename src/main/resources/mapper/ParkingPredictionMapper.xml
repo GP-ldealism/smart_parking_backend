@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.gp.smartparking.mapper.ParkingPredictionMapper">
 
-    <resultMap id="BaseResultMap" type="cn.gp.smartparking.domain.entity.ParkingPrediction">
+    <resultMap id="BaseResultMap" type="cn.gp.smartparking.model.entity.ParkingPrediction">
             <id property="id" column="id" />
             <result property="parking_lot_id" column="parking_lot_id" />
             <result property="predict_time" column="predict_time" />

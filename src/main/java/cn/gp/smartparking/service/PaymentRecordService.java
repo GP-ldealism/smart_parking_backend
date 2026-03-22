@@ -1,6 +1,6 @@
 package cn.gp.smartparking.service;
 
-import cn.gp.smartparking.domain.entity.PaymentRecord;
+import cn.gp.smartparking.model.entity.PaymentRecord;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

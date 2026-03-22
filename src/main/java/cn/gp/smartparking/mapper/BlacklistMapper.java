@@ -1,6 +1,6 @@
 package cn.gp.smartparking.mapper;
 
-import cn.gp.smartparking.domain.entity.Blacklist;
+import cn.gp.smartparking.model.entity.Blacklist;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

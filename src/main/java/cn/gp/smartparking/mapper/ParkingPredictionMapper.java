@@ -1,6 +1,6 @@
 package cn.gp.smartparking.mapper;
 
-import cn.gp.smartparking.domain.entity.ParkingPrediction;
+import cn.gp.smartparking.model.entity.ParkingPrediction;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

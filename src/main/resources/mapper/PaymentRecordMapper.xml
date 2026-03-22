@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.gp.smartparking.mapper.PaymentRecordMapper">
 
-    <resultMap id="BaseResultMap" type="cn.gp.smartparking.domain.entity.PaymentRecord">
+    <resultMap id="BaseResultMap" type="cn.gp.smartparking.model.entity.PaymentRecord">
             <id property="id" column="id" />
             <result property="order_id" column="order_id" />
             <result property="payment_no" column="payment_no" />

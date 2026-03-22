@@ -1,4 +1,4 @@
-package cn.gp.smartparking.domain.entity;
+package cn.gp.smartparking.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -9,12 +9,12 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 消息通知表
- * @TableName notification
+ * 黑名单表
+ * @TableName blacklist
  */
-@TableName(value ="notification")
+@TableName(value ="blacklist")
 @Data
-public class Notification implements Serializable {
+public class Blacklist implements Serializable {
     /**
      * 
      */
@@ -22,34 +22,19 @@ public class Notification implements Serializable {
     private Long id;
 
     /**
-     * 接收用户
+     * 车牌号
      */
-    private Long user_id;
+    private String plate_number;
 
     /**
-     * 标题
+     * 加入原因
      */
-    private String title;
+    private String reason;
 
     /**
-     * 内容
+     * 过期时间
      */
-    private String content;
-
-    /**
-     * 0=系统通知 1=订单提醒 2=优惠活动
-     */
-    private Integer type;
-
-    /**
-     * 0=未读 1=已读
-     */
-    private Integer is_read;
-
-    /**
-     * 业务ID
-     */
-    private String biz_id;
+    private Date expire_time;
 
     /**
      * 乐观锁

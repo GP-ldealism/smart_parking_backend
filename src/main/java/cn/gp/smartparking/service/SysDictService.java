@@ -1,6 +1,6 @@
 package cn.gp.smartparking.service;
 
-import cn.gp.smartparking.domain.entity.SysDict;
+import cn.gp.smartparking.model.entity.SysDict;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

@@ -1,21 +1,20 @@
-package cn.gp.smartparking.domain.entity;
+package cn.gp.smartparking.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 
 /**
- * 车位占用率预测结果表
- * @TableName parking_prediction
+ * 用户停车偏好表
+ * @TableName user_preference
  */
-@TableName(value ="parking_prediction")
+@TableName(value ="user_preference")
 @Data
-public class ParkingPrediction implements Serializable {
+public class UserPreference implements Serializable {
     /**
      * 
      */
@@ -23,19 +22,24 @@ public class ParkingPrediction implements Serializable {
     private Long id;
 
     /**
-     * 
+     * 用户ID
      */
-    private Long parking_lot_id;
+    private Long user_id;
 
     /**
-     * 预测时间点
+     * 偏好最大距离（米）
      */
-    private Date predict_time;
+    private Integer prefer_distance;
 
     /**
-     * 预测占用率
+     * 0=便宜优先 1=距离优先
      */
-    private BigDecimal occupancy_rate;
+    private Integer prefer_price;
+
+    /**
+     * 偏好车位类型
+     */
+    private Integer prefer_type;
 
     /**
      * 乐观锁

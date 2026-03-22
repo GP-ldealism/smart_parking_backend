@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.gp.smartparking.mapper.BlacklistMapper">
 
-    <resultMap id="BaseResultMap" type="cn.gp.smartparking.domain.entity.Blacklist">
+    <resultMap id="BaseResultMap" type="cn.gp.smartparking.model.entity.Blacklist">
             <id property="id" column="id" />
             <result property="plate_number" column="plate_number" />
             <result property="reason" column="reason" />

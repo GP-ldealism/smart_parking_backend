@@ -1,4 +1,4 @@
-package cn.gp.smartparking.domain.entity;
+package cn.gp.smartparking.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -9,42 +9,32 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 系统用户表
- * @TableName user
+ * 用户车牌表
+ * @TableName user_plate
  */
-@TableName(value ="user")
+@TableName(value ="user_plate")
 @Data
-public class User implements Serializable {
+public class UserPlate implements Serializable {
     /**
-     * 用户ID
+     * 
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 账号
+     * 
      */
-    private String username;
+    private Long user_id;
 
     /**
-     * 密码（加密）
+     * 车牌号
      */
-    private String password;
+    private String plate_number;
 
     /**
-     * 昵称
+     * 0=非默认 1=默认
      */
-    private String nickname;
-
-    /**
-     * 手机号
-     */
-    private String phone;
-
-    /**
-     * 0=车主 1=管理员
-     */
-    private Integer role;
+    private Integer is_default;
 
     /**
      * 0=禁用 1=正常

@@ -1,4 +1,4 @@
-package cn.gp.smartparking.domain.entity;
+package cn.gp.smartparking.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -10,12 +10,12 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 支付记录表
- * @TableName payment_record
+ * 车位占用率预测结果表
+ * @TableName parking_prediction
  */
-@TableName(value ="payment_record")
+@TableName(value ="parking_prediction")
 @Data
-public class PaymentRecord implements Serializable {
+public class ParkingPrediction implements Serializable {
     /**
      * 
      */
@@ -23,39 +23,19 @@ public class PaymentRecord implements Serializable {
     private Long id;
 
     /**
-     * 订单ID
+     * 
      */
-    private Long order_id;
+    private Long parking_lot_id;
 
     /**
-     * 支付流水号
+     * 预测时间点
      */
-    private String payment_no;
+    private Date predict_time;
 
     /**
-     * 支付金额
+     * 预测占用率
      */
-    private BigDecimal amount;
-
-    /**
-     * 0=微信 1=支付宝 2=余额
-     */
-    private Integer payment_method;
-
-    /**
-     * 0=待支付 1=成功 2=失败
-     */
-    private Integer payment_status;
-
-    /**
-     * 第三方交易号
-     */
-    private String transaction_id;
-
-    /**
-     * 支付完成时间
-     */
-    private Date payment_time;
+    private BigDecimal occupancy_rate;
 
     /**
      * 乐观锁

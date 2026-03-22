@@ -1,7 +1,7 @@
 package cn.gp.smartparking.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import cn.gp.smartparking.domain.entity.ParkingUsageHistory;
+import cn.gp.smartparking.model.entity.ParkingUsageHistory;
 import cn.gp.smartparking.service.ParkingUsageHistoryService;
 import cn.gp.smartparking.mapper.ParkingUsageHistoryMapper;
 import org.springframework.stereotype.Service;

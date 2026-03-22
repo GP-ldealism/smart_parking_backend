@@ -1,4 +1,4 @@
-package cn.gp.smartparking.domain.entity;
+package cn.gp.smartparking.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -9,12 +9,12 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 系统数据字典
- * @TableName sys_dict
+ * 消息通知表
+ * @TableName notification
  */
-@TableName(value ="sys_dict")
+@TableName(value ="notification")
 @Data
-public class SysDict implements Serializable {
+public class Notification implements Serializable {
     /**
      * 
      */
@@ -22,24 +22,34 @@ public class SysDict implements Serializable {
     private Long id;
 
     /**
-     * 字典类型
+     * 接收用户
      */
-    private String dict_type;
+    private Long user_id;
 
     /**
-     * 键
+     * 标题
      */
-    private String dict_key;
+    private String title;
 
     /**
-     * 值
+     * 内容
      */
-    private String dict_value;
+    private String content;
 
     /**
-     * 排序
+     * 0=系统通知 1=订单提醒 2=优惠活动
      */
-    private Integer sort_order;
+    private Integer type;
+
+    /**
+     * 0=未读 1=已读
+     */
+    private Integer is_read;
+
+    /**
+     * 业务ID
+     */
+    private String biz_id;
 
     /**
      * 乐观锁

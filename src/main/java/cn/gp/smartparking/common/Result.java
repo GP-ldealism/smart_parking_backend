@@ -20,11 +20,11 @@ public class Result<T> implements Serializable {
     }
 
     public static <T> Result<T> success(String message, T data) {
-        return new Result<>(20000, message, data);
+        return new Result<>(BusinessCode.SUCCESS.getCode(), message, data);
     }
 
     public static <T> Result<T> success(String message) {
-        return new Result<>(20001, message, null);
+        return new Result<>(BusinessCode.SUCCESS.getCode(), message, null);
     }
 
     public static <T> Result<T> fail(int code, String message) {
@@ -32,7 +32,7 @@ public class Result<T> implements Serializable {
     }
 
     public static <T> Result<T> fail(String message) {
-        return new Result<>(40000, message, null);
+        return new Result<>(BusinessCode.PARAMS_ERROR.getCode(), message, null);
     }
 
 }
