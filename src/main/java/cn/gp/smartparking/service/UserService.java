@@ -4,9 +4,6 @@ import cn.gp.smartparking.model.entity.User;
 import cn.gp.smartparking.model.vo.UserVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 
 /**
 * @author HeGuoping
@@ -29,4 +26,11 @@ public interface UserService extends IService<User> {
      * @return
      */
     UserVO userLogin(HttpServletRequest request, User user);
+
+    /**
+     * 用户退出登录
+     * @param request
+     * @return
+     */
+    void userLogout(HttpServletRequest request);
 }

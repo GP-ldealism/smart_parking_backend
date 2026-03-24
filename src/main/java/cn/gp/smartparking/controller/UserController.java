@@ -37,4 +37,10 @@ public class UserController {
         UserVO userVO = userService.userLogin(request, user);
         return Result.success("登录成功", userVO);
     }
+
+    @PostMapping("/logout")
+    public Result<Void> logout(HttpServletRequest request) {
+        userService.userLogout(request);
+        return Result.success("退出登录成功");
+    }
 }

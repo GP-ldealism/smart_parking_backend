@@ -3,10 +3,8 @@ package cn.gp.smartparking.service.impl;
 import cn.gp.smartparking.common.BusinessCode;
 import cn.gp.smartparking.constant.UserConstant;
 import cn.gp.smartparking.exception.BusinessException;
-import cn.gp.smartparking.exception.ThrowUtils;
 import cn.gp.smartparking.model.vo.UserVO;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.gp.smartparking.model.entity.User;
 import cn.gp.smartparking.service.UserService;
@@ -72,6 +70,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
 
         return userVO;
+    }
+
+    @Override
+    public void userLogout(HttpServletRequest request) {
+        request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
     }
 }
 

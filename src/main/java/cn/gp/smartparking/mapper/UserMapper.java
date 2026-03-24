@@ -20,7 +20,7 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("select count(*) from user where username = #{username}")
     int selectByUsername(@Param("username") String username);
 
-//    @Select("select  from user where username = #{username} and password = #{password}")
+//    @Select("select id, username, nickname, avatar from user where username = #{username} and password = #{password}")
     UserVO selectByUsernameAndPassword(@Param("username") String username,
                                        @Param("password") String password);
 }

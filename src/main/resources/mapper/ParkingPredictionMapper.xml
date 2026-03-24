@@ -6,15 +6,15 @@
 
     <resultMap id="BaseResultMap" type="cn.gp.smartparking.model.entity.ParkingPrediction">
             <id property="id" column="id" />
-            <result property="parking_lot_id" column="parking_lot_id" />
-            <result property="predict_time" column="predict_time" />
-            <result property="occupancy_rate" column="occupancy_rate" />
+            <result property="parkingLotId" column="parking_lot_id" />
+            <result property="predictTime" column="predict_time" />
+            <result property="occupancyRate" column="occupancy_rate" />
             <result property="version" column="version" />
-            <result property="create_by" column="create_by" />
-            <result property="create_time" column="create_time" />
-            <result property="update_by" column="update_by" />
-            <result property="update_time" column="update_time" />
-            <result property="is_deleted" column="is_deleted" />
+            <result property="createBy" column="create_by" />
+            <result property="createTime" column="create_time" />
+            <result property="updateBy" column="update_by" />
+            <result property="updateTime" column="update_time" />
+            <result property="isDeleted" column="is_deleted" />
     </resultMap>
 
     <sql id="Base_Column_List">

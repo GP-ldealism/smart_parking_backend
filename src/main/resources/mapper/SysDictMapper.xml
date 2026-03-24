@@ -6,16 +6,16 @@
 
     <resultMap id="BaseResultMap" type="cn.gp.smartparking.model.entity.SysDict">
             <id property="id" column="id" />
-            <result property="dict_type" column="dict_type" />
-            <result property="dict_key" column="dict_key" />
-            <result property="dict_value" column="dict_value" />
-            <result property="sort_order" column="sort_order" />
+            <result property="dictType" column="dict_type" />
+            <result property="dictKey" column="dict_key" />
+            <result property="dictValue" column="dict_value" />
+            <result property="sortOrder" column="sort_order" />
             <result property="version" column="version" />
-            <result property="create_by" column="create_by" />
-            <result property="create_time" column="create_time" />
-            <result property="update_by" column="update_by" />
-            <result property="update_time" column="update_time" />
-            <result property="is_deleted" column="is_deleted" />
+            <result property="createBy" column="create_by" />
+            <result property="createTime" column="create_time" />
+            <result property="updateBy" column="update_by" />
+            <result property="updateTime" column="update_time" />
+            <result property="isDeleted" column="is_deleted" />
     </resultMap>
 
     <sql id="Base_Column_List">
