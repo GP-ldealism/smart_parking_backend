@@ -25,4 +25,21 @@
         status,version,create_by,create_time,update_by,
         update_time,is_deleted
     </sql>
+
+    <select id="selectByUsernameAndPassword" resultType="cn.gp.smartparking.model.vo.UserVO">
+        select
+            id,
+            username,
+            nickname,
+            phone,
+            `role`,
+            create_time
+        from
+            user
+        where
+            username = #{username,jdbcType=VARCHAR}
+            and password = #{password,jdbcType=VARCHAR}
+            and status = 1
+            and is_deleted = 0
+    </select>
 </mapper>

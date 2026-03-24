@@ -1,7 +1,9 @@
 package cn.gp.smartparking.mapper;
 
 import cn.gp.smartparking.model.entity.User;
+import cn.gp.smartparking.model.vo.UserVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.*;
 
 /**
 * @author HeGuoping
@@ -11,6 +13,16 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface UserMapper extends BaseMapper<User> {
 
+    @Insert("insert into user(username, password) values(#{username}, #{password})")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+    int userRegister(User user);
+
+    @Select("select count(*) from user where username = #{username}")
+    int selectByUsername(@Param("username") String username);
+
+//    @Select("select  from user where username = #{username} and password = #{password}")
+    UserVO selectByUsernameAndPassword(@Param("username") String username,
+                                       @Param("password") String password);
 }
 
 

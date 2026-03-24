@@ -1,7 +1,12 @@
 package cn.gp.smartparking.service;
 
 import cn.gp.smartparking.model.entity.User;
+import cn.gp.smartparking.model.vo.UserVO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
 * @author HeGuoping
@@ -10,4 +15,18 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface UserService extends IService<User> {
 
+    /**
+     * 用户注册
+     * @param user
+     * @return
+     */
+    Long userRegister(User user);
+
+    /**
+     * 用户登录
+     * @param request
+     * @param user
+     * @return
+     */
+    UserVO userLogin(HttpServletRequest request, User user);
 }

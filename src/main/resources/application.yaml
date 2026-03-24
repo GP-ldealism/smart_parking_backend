@@ -17,9 +17,23 @@ spring:
 # MyBatis-Plus配置
 mybatis-plus:
   configuration:
-    map-underscore-to-camel-case: true # 下划线转驼峰
+    map-underscore-to-camel-case: false # 下划线转驼峰
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL日志
-  mapper-locations: classpath:mapper/**/*.xml # Mapper.xml路径
-  type-aliases-package: com.smartparking.model.entity # 实体类别名包
+  global-config:
+    db-config:
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
 
-
+# Knife4j配置
+knife4j:
+  enable: true
+  openapi:
+    title: 智慧云停车平台接口文档
+    version: 1.0
+    group:
+      default:
+        #        group-name: 默认分组
+        api-rule: package
+        api-rule-resources:
+          - cn.gp.smartparking

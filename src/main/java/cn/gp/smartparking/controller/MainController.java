@@ -11,7 +11,7 @@ public class MainController {
 
     @GetMapping("/health")
     public Result<String> health() {
-        return Result.success("OK");
+        return Result.success("OK", "你好hello tomcat");
     }
 
     @GetMapping("/exception")
