@@ -2,15 +2,18 @@ package cn.gp.smartparking.controller;
 
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.entity.User;
+import cn.gp.smartparking.model.vo.OrderStatisticVO;
 import cn.gp.smartparking.model.vo.UserVO;
+import cn.gp.smartparking.service.ParkingOrderService;
 import cn.gp.smartparking.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * @ClassName UserController
@@ -25,6 +28,9 @@ public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private ParkingOrderService parkingOrderService;
 
     @PostMapping("/register")
     public Result<Long> register(@RequestBody User user) {
@@ -43,4 +49,19 @@ public class UserController {
         userService.userLogout(request);
         return Result.success("退出登录成功");
     }
+
+    @PutMapping("/update/{id}")
+    public Result<String> update(@PathVariable Long id,
+                                 @RequestBody User user) {
+        userService.updateUserProfile(id, user);
+        return Result.success("修改成功");
+    }
+
+    @Operation(summary = "获取用户订单统计信息")
+    @GetMapping("/statistics/{id}")
+    public Result<OrderStatisticVO> getUserOrderStatistics(@PathVariable Long id) {
+        OrderStatisticVO statistics = parkingOrderService.getUserOrderStatistics(id);
+        return Result.success("获取用户订单统计信息成功", statistics);
+    }
+
 }

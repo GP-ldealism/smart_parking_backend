@@ -33,4 +33,13 @@ public interface UserService extends IService<User> {
      * @return
      */
     void userLogout(HttpServletRequest request);
+
+    boolean updateUserProfile(Long id, User user);
+
+    /**
+     * 创建用户（管理员功能）
+     * @param user 用户信息
+     * @return 新用户ID
+     */
+    Long createUser(User user);
 }

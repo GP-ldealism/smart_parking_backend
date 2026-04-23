@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * @ClassName PageRequest
  * @Description TODO
@@ -25,9 +27,9 @@ public class PageRequest {
     /**
      * 排序字段
      */
-    private String sortField;
+    private List<String> sortFieldList;
     /**
      * 排序顺序
      */
-    private String sortOrder = "descend";
+    private List<String> sortOrderList;
 }

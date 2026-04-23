@@ -1,0 +1,39 @@
+server:
+  port: 9003 # 服务端口
+  servlet:
+    context-path: /smart-parking # 接口前缀
+
+spring:
+  application:
+    name: smart-parking-cloud-platform
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/smart_parking?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+
+
+# MyBatis-Plus配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true # 下划线转驼峰
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL日志
+  global-config:
+    db-config:
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# Knife4j配置
+knife4j:
+  enable: true
+  openapi:
+    title: 智慧云停车平台接口文档
+    version: 1.0
+    group:
+      default:
+        #        group-name: 默认分组
+        api-rule: package
+        api-rule-resources:
+          - cn.gp.smartparking

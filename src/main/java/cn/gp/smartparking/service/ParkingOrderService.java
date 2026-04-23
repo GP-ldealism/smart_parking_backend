@@ -1,7 +1,10 @@
 package cn.gp.smartparking.service;
 
 import cn.gp.smartparking.model.entity.ParkingOrder;
+import cn.gp.smartparking.model.vo.OrderStatisticVO;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.Map;
 
 /**
 * @author HeGuoping
@@ -10,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface ParkingOrderService extends IService<ParkingOrder> {
 
+    OrderStatisticVO getUserOrderStatistics(Long id);
 }

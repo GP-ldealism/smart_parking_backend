@@ -1,4 +1,15 @@
 #custom rules
+*.log
+*.class
+
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.tar
+*.gz
+
+
 
 HELP.md
 target/

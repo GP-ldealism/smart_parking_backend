@@ -31,4 +31,14 @@
         status,version,create_by,create_time,update_by,
         update_time,is_deleted
     </sql>
+
+    <select id="getUserOrderStatistics" resultType="cn.gp.smartparking.model.vo.OrderStatisticVO">
+        select
+            count(*) as totalCount,
+            coalesce(sum(duration_minutes), 0) as totalDurationMinutes,
+            coalesce(sum(amount), 0) as totalAmount
+        from parking_order
+        where
+            user_id = #{id, jdbcType=INTEGER}
+    </select>
 </mapper>

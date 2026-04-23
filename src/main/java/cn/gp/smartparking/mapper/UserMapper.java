@@ -23,6 +23,9 @@ public interface UserMapper extends BaseMapper<User> {
 //    @Select("select id, username, nickname, avatar from user where username = #{username} and password = #{password}")
     UserVO selectByUsernameAndPassword(@Param("username") String username,
                                        @Param("password") String password);
+
+    int chooseUpdateById(@Param("id") Long id,
+                         @Param("user") User user);
 }
 
 

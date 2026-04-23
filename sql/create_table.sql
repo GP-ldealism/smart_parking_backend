@@ -1,17 +1,15 @@
 CREATE DATABASE IF NOT EXISTS smart_parking DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE smart_parking;
 
--- =====================================================
 -- 1. 用户表（车主/管理员）
--- =====================================================
 CREATE TABLE user (
-                      id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
+                      id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
 
     -- 业务字段
-                      username VARCHAR(50) NOT NULL UNIQUE COMMENT '账号',
-                      password VARCHAR(100) NOT NULL COMMENT '密码（加密）',
-                      nickname VARCHAR(50) COMMENT '昵称',
-                      phone VARCHAR(20) COMMENT '手机号',
+                      username VARCHAR(64) NOT NULL UNIQUE COMMENT '账号',
+                      password VARCHAR(128) NOT NULL COMMENT '密码',
+                      nickname VARCHAR(64) COMMENT '昵称',
+                      phone VARCHAR(32) COMMENT '手机号',
                       role TINYINT DEFAULT 0 COMMENT '0=车主 1=管理员',
                       status TINYINT DEFAULT 1 COMMENT '0=禁用 1=正常',
 
@@ -27,21 +25,19 @@ CREATE TABLE user (
                       INDEX idx_phone (phone)
 ) COMMENT='系统用户表';
 
--- =====================================================
 -- 2. 停车场信息表
--- =====================================================
 CREATE TABLE parking_lot (
-                             id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '停车场ID',
+                             id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
 
     -- 业务字段
-                             name VARCHAR(100) NOT NULL COMMENT '停车场名称',
-                             address VARCHAR(200) NOT NULL COMMENT '地址',
+                             name VARCHAR(128) NOT NULL COMMENT '停车场名称',
+                             address VARCHAR(256) NOT NULL COMMENT '地址',
                              longitude DECIMAL(10,6) COMMENT '经度',
                              latitude DECIMAL(10,6) COMMENT '纬度',
                              total_space INT NOT NULL COMMENT '总车位',
                              free_space INT DEFAULT 0 COMMENT '空闲车位',
                              rate DECIMAL(5,2) NOT NULL COMMENT '每小时费率',
-                             open_time VARCHAR(50) COMMENT '开放时间',
+                             open_time VARCHAR(64) COMMENT '开放时间',
                              status TINYINT DEFAULT 1 COMMENT '0=关闭 1=正常',
 
     -- 公共字段
@@ -56,15 +52,13 @@ CREATE TABLE parking_lot (
                              INDEX idx_location (longitude, latitude)
 ) COMMENT='停车场信息表';
 
--- =====================================================
 -- 3. 车位表
--- =====================================================
 CREATE TABLE parking_space (
-                               id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '车位ID',
+                               id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
 
     -- 业务字段
                                parking_lot_id BIGINT NOT NULL COMMENT '所属停车场ID',
-                               space_no VARCHAR(20) NOT NULL COMMENT '车位编号',
+                               space_no VARCHAR(32) NOT NULL COMMENT '车位编号',
                                type TINYINT DEFAULT 0 COMMENT '0=普通 1=新能源 2=VIP',
                                status TINYINT DEFAULT 1 COMMENT '0=占用 1=空闲',
 
@@ -81,18 +75,16 @@ CREATE TABLE parking_space (
                                UNIQUE KEY uk_lot_space (parking_lot_id, space_no, is_deleted)
 ) COMMENT='车位信息表';
 
--- =====================================================
--- 4. 停车订单表（原parking_record）
--- =====================================================
+-- 4. 停车订单表
 CREATE TABLE parking_order (
-                               id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '订单ID',
+                               id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
 
     -- 业务字段
                                order_no VARCHAR(32) NOT NULL UNIQUE COMMENT '订单号',
                                user_id BIGINT NOT NULL COMMENT '用户ID',
                                parking_lot_id BIGINT NOT NULL COMMENT '停车场ID',
-                               space_no VARCHAR(20) COMMENT '车位号',
-                               plate_number VARCHAR(20) COMMENT '车牌号',
+                               space_no VARCHAR(32) COMMENT '车位号',
+                               plate_number VARCHAR(32) COMMENT '车牌号',
                                type TINYINT NOT NULL COMMENT '0=预约 1=停车',
                                start_time DATETIME COMMENT '开始时间',
                                end_time DATETIME COMMENT '结束时间',
@@ -114,15 +106,13 @@ CREATE TABLE parking_order (
                                INDEX idx_time_range (start_time, end_time)
 ) COMMENT='停车订单表';
 
--- =====================================================
 -- 5. 车位占用历史表（预测用）
--- =====================================================
 CREATE TABLE parking_usage_history (
                                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
     -- 业务字段
                                        parking_lot_id BIGINT NOT NULL,
-                                       occupancy_rate DECIMAL(5,2) NOT NULL COMMENT '占用率 0-100',
+                                       occupancy_rate DECIMAL(5,2) NOT NULL COMMENT '占用率 0-128',
                                        record_time DATETIME NOT NULL COMMENT '记录时间',
                                        hour INT NOT NULL COMMENT '小时 0-23',
                                        weekday INT NOT NULL COMMENT '星期 1-7',
@@ -139,9 +129,7 @@ CREATE TABLE parking_usage_history (
                                        INDEX idx_lot_time (parking_lot_id, record_time)
 ) COMMENT='车位历史占用表';
 
--- =====================================================
 -- 6. 预测结果表
--- =====================================================
 CREATE TABLE parking_prediction (
                                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
@@ -161,15 +149,13 @@ CREATE TABLE parking_prediction (
                                     INDEX idx_lot_predict (parking_lot_id, predict_time)
 ) COMMENT='车位占用率预测结果表';
 
--- =====================================================
 -- 7. 用户偏好表
--- =====================================================
 CREATE TABLE user_preference (
                                  id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
     -- 业务字段
                                  user_id BIGINT NOT NULL UNIQUE COMMENT '用户ID',
-                                 prefer_distance INT DEFAULT 1000 COMMENT '偏好最大距离（米）',
+                                 prefer_distance INT DEFAULT 1280 COMMENT '偏好最大距离（米）',
                                  prefer_price INT DEFAULT 0 COMMENT '0=便宜优先 1=距离优先',
                                  prefer_type TINYINT DEFAULT 0 COMMENT '偏好车位类型',
 
@@ -184,16 +170,14 @@ CREATE TABLE user_preference (
                                  INDEX idx_user_id (user_id)
 ) COMMENT='用户停车偏好表';
 
--- =====================================================
 -- 8. 数据字典表
--- =====================================================
 CREATE TABLE sys_dict (
                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
     -- 业务字段
-                          dict_type VARCHAR(50) NOT NULL COMMENT '字典类型',
-                          dict_key VARCHAR(50) NOT NULL COMMENT '键',
-                          dict_value VARCHAR(100) NOT NULL COMMENT '值',
+                          dict_type VARCHAR(64) NOT NULL COMMENT '字典类型',
+                          dict_key VARCHAR(64) NOT NULL COMMENT '键',
+                          dict_value VARCHAR(128) NOT NULL COMMENT '值',
                           sort_order INT DEFAULT 0 COMMENT '排序',
 
     -- 公共字段
@@ -207,16 +191,14 @@ CREATE TABLE sys_dict (
                           UNIQUE KEY uk_dict_type_key (dict_type, dict_key, is_deleted)
 ) COMMENT='系统数据字典';
 
--- =====================================================
 -- 9. 系统操作日志表
--- =====================================================
 CREATE TABLE sys_log (
                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
     -- 业务字段
                          user_id BIGINT COMMENT '操作用户',
                          content VARCHAR(255) COMMENT '操作内容',
-                         ip VARCHAR(50) COMMENT 'IP地址',
+                         ip VARCHAR(64) COMMENT 'IP地址',
 
     -- 公共字段（日志表一般只需要创建时间）
                          create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -225,15 +207,13 @@ CREATE TABLE sys_log (
                          INDEX idx_create_time (create_time)
 ) COMMENT='系统操作日志表';
 
--- =====================================================
 -- 10. 车牌管理表
--- =====================================================
 CREATE TABLE user_plate (
                             id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
     -- 业务字段
                             user_id BIGINT NOT NULL,
-                            plate_number VARCHAR(20) NOT NULL COMMENT '车牌号',
+                            plate_number VARCHAR(32) NOT NULL COMMENT '车牌号',
                             is_default TINYINT DEFAULT 0 COMMENT '0=非默认 1=默认',
                             status TINYINT DEFAULT 1 COMMENT '0=禁用 1=正常',
 
@@ -249,9 +229,7 @@ CREATE TABLE user_plate (
                             INDEX idx_plate (plate_number)
 ) COMMENT='用户车牌表';
 
--- =====================================================
 -- 11. 支付记录表
--- =====================================================
 CREATE TABLE payment_record (
                                 id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
@@ -261,7 +239,7 @@ CREATE TABLE payment_record (
                                 amount DECIMAL(8,2) NOT NULL COMMENT '支付金额',
                                 payment_method TINYINT NOT NULL COMMENT '0=微信 1=支付宝 2=余额',
                                 payment_status TINYINT DEFAULT 0 COMMENT '0=待支付 1=成功 2=失败',
-                                transaction_id VARCHAR(100) COMMENT '第三方交易号',
+                                transaction_id VARCHAR(128) COMMENT '第三方交易号',
                                 payment_time DATETIME COMMENT '支付完成时间',
 
     -- 公共字段
@@ -276,19 +254,17 @@ CREATE TABLE payment_record (
                                 INDEX idx_payment_no (payment_no)
 ) COMMENT='支付记录表';
 
--- =====================================================
 -- 12. 消息通知表
--- =====================================================
 CREATE TABLE notification (
                               id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
     -- 业务字段
                               user_id BIGINT NOT NULL COMMENT '接收用户',
-                              title VARCHAR(100) NOT NULL COMMENT '标题',
+                              title VARCHAR(128) NOT NULL COMMENT '标题',
                               content TEXT COMMENT '内容',
                               type TINYINT COMMENT '0=系统通知 1=订单提醒 2=优惠活动',
                               is_read TINYINT DEFAULT 0 COMMENT '0=未读 1=已读',
-                              biz_id VARCHAR(50) COMMENT '业务ID',
+                              biz_id VARCHAR(64) COMMENT '业务ID',
 
     -- 公共字段
                               version INT DEFAULT 0 COMMENT '乐观锁',
@@ -301,15 +277,13 @@ CREATE TABLE notification (
                               INDEX idx_user_notify (user_id, is_read, create_time)
 ) COMMENT='消息通知表';
 
--- =====================================================
 -- 13. 黑名单表
--- =====================================================
 CREATE TABLE blacklist (
                            id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
     -- 业务字段
-                           plate_number VARCHAR(20) NOT NULL COMMENT '车牌号',
-                           reason VARCHAR(200) COMMENT '加入原因',
+                           plate_number VARCHAR(32) NOT NULL COMMENT '车牌号',
+                           reason VARCHAR(256) COMMENT '加入原因',
                            expire_time DATETIME COMMENT '过期时间',
 
     -- 公共字段
@@ -323,16 +297,14 @@ CREATE TABLE blacklist (
                            UNIQUE KEY uk_plate (plate_number, is_deleted)
 ) COMMENT='黑名单表';
 
--- =====================================================
 -- 14. 优惠券表
--- =====================================================
 CREATE TABLE coupon (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
     -- 业务字段
                         user_id BIGINT COMMENT '所属用户（NULL=通用券）',
                         code VARCHAR(32) UNIQUE COMMENT '优惠码',
-                        name VARCHAR(100) NOT NULL COMMENT '优惠券名称',
+                        name VARCHAR(128) NOT NULL COMMENT '优惠券名称',
                         type TINYINT COMMENT '0=满减 1=折扣 2=时长',
                         value DECIMAL(8,2) COMMENT '优惠值',
                         min_amount DECIMAL(8,2) COMMENT '最低消费',
@@ -354,27 +326,3 @@ CREATE TABLE coupon (
                         INDEX idx_code (code),
                         INDEX idx_time_range (start_time, end_time)
 ) COMMENT='优惠券表';
-
--- =====================================================
--- 预置基础数据
--- =====================================================
-INSERT INTO sys_dict (dict_type, dict_key, dict_value, sort_order) VALUES
-                                                                       ('parking_type', '0', '普通车位', 1),
-                                                                       ('parking_type', '1', '新能源车位', 2),
-                                                                       ('parking_type', '2', 'VIP车位', 3),
-                                                                       ('order_status', '0', '待进场', 1),
-                                                                       ('order_status', '1', '已完成', 2),
-                                                                       ('order_status', '2', '已取消', 3),
-                                                                       ('payment_method', '0', '微信支付', 1),
-                                                                       ('payment_method', '1', '支付宝', 2),
-                                                                       ('payment_method', '2', '余额支付', 3),
-                                                                       ('coupon_type', '0', '满减券', 1),
-                                                                       ('coupon_type', '1', '折扣券', 2),
-                                                                       ('coupon_type', '2', '时长券', 3),
-                                                                       ('notify_type', '0', '系统通知', 1),
-                                                                       ('notify_type', '1', '订单提醒', 2),
-                                                                       ('notify_type', '2', '优惠活动', 3);
-
--- 创建管理员账号（密码需要加密，这里只是示例）
-INSERT INTO user (username, password, nickname, role) VALUES
-    ('admin', '加密后的密码', '系统管理员', 1);
