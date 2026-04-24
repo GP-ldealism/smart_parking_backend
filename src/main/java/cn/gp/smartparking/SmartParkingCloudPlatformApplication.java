@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("cn.gp.smartparking.mapper")
+@MapperScan({"cn.gp.smartparking.mapper", "cn.gp.smartparking.algorithm.mapper"})
 public class SmartParkingCloudPlatformApplication {
 
     public static void main(String[] args) {

@@ -6,25 +6,34 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * WebMvc配置类
- */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
     private JwtAuthInterceptor jwtAuthInterceptor;
 
+
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtAuthInterceptor)
-                .addPathPatterns("/api/**")
+                .addPathPatterns("/**")
                 .excludePathPatterns(
-                        "/api/user/login",
-                        "/api/user/register",
-                        "/api/parking-lot/list",
-                        "/api/prediction/overview",
-                        "/api/alipay/**"
+                        "/doc.html",
+                        "/doc.html/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/webjars/**",
+                        "/user/login",
+                        "/user/register",
+                        "/parkingLot/list",
+                        "/parking-lot/list",
+                        "/prediction/**",
+                        "/algorithm/prediction/**",
+                        "/alipay/**",
+                        "/main/**",
+                        "/error"
                 );
     }
 }
