@@ -265,6 +265,9 @@ CREATE TABLE notification (
                               type TINYINT COMMENT '0=系统通知 1=订单提醒 2=优惠活动',
                               is_read TINYINT DEFAULT 0 COMMENT '0=未读 1=已读',
                               biz_id VARCHAR(64) COMMENT '业务ID',
+                              push_status TINYINT DEFAULT 0 COMMENT '0=未推送 1=已推送 2=推送失败',
+                              push_time DATETIME COMMENT '推送时间',
+                              push_fail_reason VARCHAR(256) COMMENT '推送失败原因',
 
     -- 公共字段
                               version INT DEFAULT 0 COMMENT '乐观锁',
@@ -274,8 +277,14 @@ CREATE TABLE notification (
                               update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                               is_deleted TINYINT DEFAULT 0 COMMENT '0=未删除 1=已删除',
 
-                              INDEX idx_user_notify (user_id, is_read, create_time)
+                              INDEX idx_user_notify (user_id, is_read, create_time),
+                              INDEX idx_push_status (push_status, create_time)
 ) COMMENT='消息通知表';
+ALTER TABLE notification
+    ADD COLUMN push_status TINYINT DEFAULT 0 COMMENT '0=未推送 1=已推送 2=推送失败',
+    ADD COLUMN push_time DATETIME COMMENT '推送时间',
+    ADD COLUMN push_fail_reason VARCHAR(256) COMMENT '推送失败原因',
+    ADD INDEX idx_push_status (push_status, create_time);
 
 -- 13. 黑名单表
 CREATE TABLE blacklist (

@@ -1,20 +1,15 @@
 package cn.gp.smartparking.controller;
 
 import cn.gp.smartparking.common.Result;
+import cn.gp.smartparking.model.dto.CouponPushDTO;
 import cn.gp.smartparking.model.entity.Coupon;
 import cn.gp.smartparking.service.CouponService;
+import cn.gp.smartparking.websocket.service.ParkingWebSocketIntegrationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -29,6 +24,9 @@ public class CouponController {
 
     @Resource
     private CouponService couponService;
+    
+    @Resource
+    private ParkingWebSocketIntegrationService webSocketIntegrationService;
 
     @Operation(summary = "获取优惠券列表")
     @GetMapping("/list")
@@ -185,5 +183,64 @@ public class CouponController {
         stats.put("expiredCount", expiredCount);
 
         return Result.success("获取优惠券统计数据成功", stats);
+    }
+
+    @Operation(summary = "推送优惠券给用户（管理员功能）")
+    @PostMapping("/push")
+    public Result<Void> pushCoupon(@RequestBody CouponPushDTO dto, HttpServletRequest request) {
+        try {
+            // 创建优惠券实体
+            Coupon coupon = new Coupon();
+            coupon.setName(dto.getName());
+            coupon.setType(dto.getType());
+            coupon.setValue(dto.getValue());
+            coupon.setMinAmount(dto.getMinAmount());
+            coupon.setStartTime(dto.getStartTime());
+            coupon.setEndTime(dto.getEndTime());
+            // 处理优惠码：如果为空或null，自动生成
+            String code = dto.getCode();
+            if (code == null || code.trim().isEmpty()) {
+                code = generateCouponCode();
+            }
+            coupon.setCode(code);
+            coupon.setStatus(0); // 未使用
+            coupon.setUserId(null); // 通用券
+            
+            // 保存优惠券
+            couponService.save(coupon);
+            
+            // 构建推送数据
+            java.util.Map<String, Object> pushData = new java.util.HashMap<>();
+            pushData.put("couponId", coupon.getId());
+            pushData.put("name", coupon.getName());
+            pushData.put("type", coupon.getType());
+            pushData.put("value", coupon.getValue());
+            pushData.put("minAmount", coupon.getMinAmount());
+            pushData.put("startTime", coupon.getStartTime());
+            pushData.put("endTime", coupon.getEndTime());
+            pushData.put("code", coupon.getCode());
+            
+            // 根据推送范围推送
+            if (dto.getPushScope() == 0) {
+                // 推送给所有车主
+                webSocketIntegrationService.broadcastCouponNotification(pushData);
+            } else if (dto.getPushScope() == 1 && dto.getUserIds() != null) {
+                // 推送给指定用户
+                for (Long userId : dto.getUserIds()) {
+                    webSocketIntegrationService.pushCouponNotification(userId, pushData);
+                }
+            }
+            
+            return Result.success("优惠券推送成功");
+        } catch (Exception e) {
+            return Result.fail("优惠券推送失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 生成随机优惠码
+     */
+    private String generateCouponCode() {
+        return "CPN" + System.currentTimeMillis() + (int)(Math.random() * 1000);
     }
 }

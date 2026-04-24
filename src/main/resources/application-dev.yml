@@ -1,0 +1,41 @@
+# 开发环境配置
+# 用于覆盖主配置文件中的敏感信息或环境特定配置
+
+spring:
+  # 开发环境数据库配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/smart_parking_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: dev_password_123
+  
+  # 开发环境Redis配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: dev_redis_password
+
+# 开发环境API密钥配置
+api:
+  # 支付宝沙箱环境
+  alipay:
+    app-id: your_dev_app_id
+    private-key: your_dev_private_key
+    public-key: your_dev_public_key
+    gateway-url: https://openapi.alipaydev.com/gateway.do
+  
+  # 高德地图API（开发环境）
+  amap:
+    key: your_dev_amap_key
+    web-api-key: your_dev_web_api_key
+
+# 开发环境日志配置
+logging:
+  level:
+    cn.gp.smartparking: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+
+# 开发环境WebSocket配置（调试用）
+websocket:
+  port: 8082  # 开发环境使用不同端口避免冲突

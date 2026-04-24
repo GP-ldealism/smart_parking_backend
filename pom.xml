@@ -155,6 +155,19 @@
             <version>4.3.2</version>
         </dependency>
 
+        <!-- Netty WebSocket 依赖 -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.104.Final</version>
+        </dependency>
+
+        <!-- Spring Boot WebSocket 支持 (可选，用于对比) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

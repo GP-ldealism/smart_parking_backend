@@ -1,0 +1,66 @@
+# 生产环境配置
+# 用于覆盖主配置文件中的敏感信息或环境特定配置
+
+spring:
+  # 生产环境数据库配置
+  datasource:
+    url: jdbc:mysql://prod-db-host:3306/smart_parking?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME:smart_parking_user}
+    password: ${DB_PASSWORD:prod_secure_password}
+  
+  # 生产环境Redis配置
+  data:
+    redis:
+      host: ${REDIS_HOST:prod-redis-host}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:prod_redis_password}
+
+# 生产环境API密钥配置
+api:
+  # 支付宝生产环境
+  alipay:
+    app-id: ${ALIPAY_APP_ID:prod_app_id}
+    private-key: ${ALIPAY_PRIVATE_KEY:prod_private_key}
+    public-key: ${ALIPAY_PUBLIC_KEY:prod_public_key}
+    gateway-url: https://openapi.alipay.com/gateway.do
+  
+  # 高德地图API（生产环境）
+  amap:
+    key: ${AMAP_KEY:prod_amap_key}
+    web-api-key: ${AMAP_WEB_API_KEY:prod_web_api_key}
+
+# 生产环境日志配置
+logging:
+  level:
+    cn.gp.smartparking: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    io.netty: WARN
+  file:
+    name: /var/log/smart-parking/application.log
+    max-size: 200MB
+    max-history: 60
+
+# 生产环境性能优化配置
+server:
+  # 生产环境可以调整线程池大小
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+
+# 生产环境WebSocket配置
+websocket:
+  connection:
+    max-connections: 50000  # 生产环境支持更多连接
+    idle-time: 180          # 生产环境更长的空闲时间
+
+# 生产环境安全配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized

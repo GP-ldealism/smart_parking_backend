@@ -92,7 +92,7 @@ public class NotificationController {
     }
 
     @Operation(summary = "获取未读通知数量")
-    @GetMapping("/user/{userId}/unread-count")
+    @GetMapping("/user/{userId}/unreadCount")
     public Result<Long> getUnreadCount(@PathVariable Long userId) {
         Long count = notificationService.lambdaQuery()
                 .eq(Notification::getUserId, userId)

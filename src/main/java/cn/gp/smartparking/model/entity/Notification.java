@@ -52,6 +52,21 @@ public class Notification implements Serializable {
     private String bizId;
 
     /**
+     * 0=未推送 1=已推送 2=推送失败
+     */
+    private Integer pushStatus;
+
+    /**
+     * 推送时间
+     */
+    private Date pushTime;
+
+    /**
+     * 推送失败原因
+     */
+    private String pushFailReason;
+
+    /**
      * 乐观锁
      */
     private Integer version;
