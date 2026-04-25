@@ -1,5 +1,6 @@
 package cn.gp.smartparking.zf;
 
+import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import com.alipay.api.AlipayApiException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,7 @@ public class AlipayController {
     @Resource
     private PayService payService;
 
+    @Log(module = "支付管理", operation = "支付", description = "Web端支付")
     @Operation(summary = "Web端支付 - 返回HTML表单")
     @GetMapping("/web/pay")
     @ResponseBody
@@ -38,6 +40,7 @@ public class AlipayController {
         }
     }
 
+    @Log(module = "支付管理", operation = "支付", description = "移动端支付")
     @Operation(summary = "移动端APP支付 - 返回orderString")
     @PostMapping("/mobile/pay")
     @ResponseBody

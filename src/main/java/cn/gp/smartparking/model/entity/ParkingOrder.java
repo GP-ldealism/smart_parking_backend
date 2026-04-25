@@ -78,6 +78,51 @@ public class ParkingOrder implements Serializable {
     private Integer status;
 
     /**
+     * 实际进场时间
+     */
+    private Date actualStartTime;
+
+    /**
+     * 实际出场时间
+     */
+    private Date actualEndTime;
+
+    /**
+     * 实际停车时长
+     */
+    private Integer actualDurationMinutes;
+
+    /**
+     * 取消原因
+     */
+    private String cancelReason;
+
+    /**
+     * 取消时间
+     */
+    private Date cancelTime;
+
+    /**
+     * 关联支付记录ID
+     */
+    private Long paymentId;
+
+    /**
+     * 评价分数 1-5
+     */
+    private Integer reviewScore;
+
+    /**
+     * 评价内容
+     */
+    private String reviewContent;
+
+    /**
+     * 评价时间
+     */
+    private Date reviewTime;
+
+    /**
      * 乐观锁
      */
     private Integer version;

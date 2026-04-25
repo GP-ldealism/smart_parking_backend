@@ -1,5 +1,6 @@
 package cn.gp.smartparking.controller;
 
+import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.entity.ParkingOrder;
 import cn.gp.smartparking.model.entity.User;
@@ -50,6 +51,7 @@ public class UserManagementController {
         return Result.success("获取用户信息成功", user);
     }
 
+    @Log(module = "用户管理", operation = "更新信息", description = "更新用户信息")
     @Operation(summary = "更新用户信息")
     @PutMapping("/{userId}")
     public Result<User> updateUserInfo(@PathVariable Long userId, @RequestBody User user) {
@@ -96,6 +98,7 @@ public class UserManagementController {
         return Result.success("获取用户可用车牌列表成功", availablePlates);
     }
 
+    @Log(module = "用户管理", operation = "添加车牌", description = "添加用户车牌")
     @Operation(summary = "添加用户车牌")
     @PostMapping("/{userId}/plates")
     public Result<UserPlate> addUserPlate(@PathVariable Long userId, @RequestBody UserPlate plate) {
@@ -104,6 +107,7 @@ public class UserManagementController {
         return Result.success("添加用户车牌成功", plate);
     }
 
+    @Log(module = "用户管理", operation = "删除车牌", description = "删除用户车牌")
     @Operation(summary = "删除用户车牌")
     @DeleteMapping("/plates/{plateId}")
     public Result<Void> deleteUserPlate(@PathVariable Long plateId) {
@@ -111,6 +115,7 @@ public class UserManagementController {
         return Result.success("删除用户车牌成功");
     }
 
+    @Log(module = "用户管理", operation = "设置默认车牌", description = "设置默认车牌")
     @Operation(summary = "设置默认车牌")
     @PutMapping("/plates/{plateId}/default")
     public Result<Void> setDefaultPlate(@PathVariable Long plateId) {
@@ -151,6 +156,7 @@ public class UserManagementController {
         return Result.success("获取用户偏好设置成功", preference);
     }
 
+    @Log(module = "用户管理", operation = "更新偏好", description = "更新用户偏好设置")
     @Operation(summary = "更新用户偏好设置")
     @PutMapping("/{userId}/preference")
     public Result<UserPreference> updateUserPreference(
@@ -188,6 +194,7 @@ public class UserManagementController {
         return Result.success("查询用户列表成功", users);
     }
 
+    @Log(module = "用户管理", operation = "创建用户", description = "创建用户")
     @Operation(summary = "创建用户（管理员功能）")
     @PostMapping
     public Result<Long> createUser(@RequestBody User user) {
@@ -195,6 +202,7 @@ public class UserManagementController {
         return Result.success("创建用户成功", userId);
     }
 
+    @Log(module = "用户管理", operation = "删除用户", description = "删除用户")
     @Operation(summary = "删除用户（软删除，管理员功能）")
     @DeleteMapping("/{userId}")
     public Result<Void> deleteUser(@PathVariable Long userId) {
@@ -205,6 +213,7 @@ public class UserManagementController {
         return Result.fail("删除用户失败");
     }
 
+    @Log(module = "用户管理", operation = "更新状态", description = "更新用户状态")
     @Operation(summary = "更新用户状态（启用/禁用，管理员功能）")
     @PutMapping("/{userId}/status")
     public Result<Void> updateUserStatus(

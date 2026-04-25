@@ -1,5 +1,6 @@
 package cn.gp.smartparking.controller;
 
+import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.entity.ParkingLot;
 import cn.gp.smartparking.model.entity.ParkingSpace;
@@ -118,6 +119,7 @@ public class ParkingLotController {
         return Result.success("搜索停车场成功", parkingLots);
     }
 
+    @Log(module = "停车场管理", operation = "创建", description = "创建停车场")
     @Operation(summary = "创建停车场（管理员功能）")
     @PostMapping
     public Result<Long> createParkingLot(@RequestBody ParkingLot parkingLot) {
@@ -125,6 +127,7 @@ public class ParkingLotController {
         return Result.success("创建停车场成功", parkingLot.getId());
     }
 
+    @Log(module = "停车场管理", operation = "更新", description = "更新停车场信息")
     @Operation(summary = "更新停车场信息（管理员功能）")
     @PutMapping("/{id}")
     public Result<Void> updateParkingLot(@PathVariable Long id, @RequestBody ParkingLot parkingLot) {
@@ -133,6 +136,7 @@ public class ParkingLotController {
         return Result.success("更新停车场信息成功");
     }
 
+    @Log(module = "停车场管理", operation = "删除", description = "删除停车场")
     @Operation(summary = "删除停车场（软删除，管理员功能）")
     @DeleteMapping("/{id}")
     public Result<Void> deleteParkingLot(@PathVariable Long id) {
@@ -143,6 +147,7 @@ public class ParkingLotController {
         return Result.fail("删除停车场失败");
     }
 
+    @Log(module = "停车场管理", operation = "更新状态", description = "更新停车场状态")
     @Operation(summary = "更新停车场状态（管理员功能）")
     @PutMapping("/{id}/status")
     public Result<Void> updateParkingLotStatus(

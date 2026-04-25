@@ -1,5 +1,6 @@
 package cn.gp.smartparking.controller;
 
+import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.entity.PaymentRecord;
 import cn.gp.smartparking.service.PaymentRecordService;
@@ -26,6 +27,7 @@ public class PaymentController {
     @Resource
     private PaymentRecordService paymentRecordService;
 
+    @Log(module = "支付管理", operation = "创建", description = "创建支付记录")
     @Operation(summary = "创建支付记录")
     @PostMapping
     public Result<PaymentRecord> createPayment(@RequestBody PaymentRecord paymentRecord) {
@@ -59,6 +61,7 @@ public class PaymentController {
         return Result.success("获取用户支付记录列表成功", payments);
     }
 
+    @Log(module = "支付管理", operation = "更新状态", description = "更新支付状态")
     @Operation(summary = "更新支付状态")
     @PostMapping("/{id}/status")
     public Result<Void> updatePaymentStatus(

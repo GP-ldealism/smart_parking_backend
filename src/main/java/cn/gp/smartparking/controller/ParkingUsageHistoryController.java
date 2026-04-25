@@ -1,5 +1,6 @@
 package cn.gp.smartparking.controller;
 
+import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.entity.ParkingUsageHistory;
 import cn.gp.smartparking.service.ParkingUsageHistoryService;
@@ -51,6 +52,7 @@ public class ParkingUsageHistoryController {
         return Result.success("获取历史记录详情成功", history);
     }
 
+    @Log(module = "历史记录管理", operation = "创建", description = "创建历史记录")
     @Operation(summary = "创建历史记录")
     @PostMapping
     public Result<ParkingUsageHistory> createHistory(@RequestBody ParkingUsageHistory history) {
@@ -58,6 +60,7 @@ public class ParkingUsageHistoryController {
         return Result.success("创建历史记录成功", history);
     }
 
+    @Log(module = "历史记录管理", operation = "更新", description = "更新历史记录")
     @Operation(summary = "更新历史记录")
     @PutMapping("/{id}")
     public Result<ParkingUsageHistory> updateHistory(@PathVariable Long id, @RequestBody ParkingUsageHistory history) {
@@ -67,6 +70,7 @@ public class ParkingUsageHistoryController {
         return Result.success("更新历史记录成功", updated);
     }
 
+    @Log(module = "历史记录管理", operation = "删除", description = "删除历史记录")
     @Operation(summary = "删除历史记录")
     @DeleteMapping("/{id}")
     public Result<Void> deleteHistory(@PathVariable Long id) {
@@ -99,6 +103,7 @@ public class ParkingUsageHistoryController {
         return Result.success("获取时间段统计成功", histories);
     }
 
+    @Log(module = "历史记录管理", operation = "批量导入", description = "批量导入历史记录")
     @Operation(summary = "批量导入历史记录")
     @PostMapping("/batch")
     public Result<Void> batchImportHistory(@RequestBody List<ParkingUsageHistory> histories) {

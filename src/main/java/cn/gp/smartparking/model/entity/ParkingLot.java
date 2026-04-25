@@ -68,6 +68,16 @@ public class ParkingLot implements Serializable {
     private Integer status;
 
     /**
+     * 用户评分
+     */
+    private BigDecimal rating;
+
+    /**
+     * 评价数量
+     */
+    private Integer reviewCount;
+
+    /**
      * 乐观锁
      */
     private Integer version;

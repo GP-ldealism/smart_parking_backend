@@ -1,5 +1,6 @@
 package cn.gp.smartparking.controller;
 
+import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.dto.CouponPushDTO;
 import cn.gp.smartparking.model.entity.Coupon;
@@ -53,6 +54,7 @@ public class CouponController {
         return Result.success("获取优惠券详情成功", coupon);
     }
 
+    @Log(module = "优惠券管理", operation = "创建", description = "创建优惠券")
     @Operation(summary = "创建优惠券")
     @PostMapping
     public Result<Coupon> createCoupon(@RequestBody Coupon coupon) {
@@ -60,6 +62,7 @@ public class CouponController {
         return Result.success("创建优惠券成功", coupon);
     }
 
+    @Log(module = "优惠券管理", operation = "更新", description = "更新优惠券")
     @Operation(summary = "更新优惠券")
     @PutMapping("/{id}")
     public Result<Coupon> updateCoupon(@PathVariable Long id, @RequestBody Coupon coupon) {
@@ -69,6 +72,7 @@ public class CouponController {
         return Result.success("更新优惠券成功", updated);
     }
 
+    @Log(module = "优惠券管理", operation = "删除", description = "删除优惠券")
     @Operation(summary = "删除优惠券")
     @DeleteMapping("/{id}")
     public Result<Void> deleteCoupon(@PathVariable Long id) {
@@ -96,6 +100,7 @@ public class CouponController {
         return Result.success("获取用户可用优惠券成功", coupons);
     }
 
+    @Log(module = "优惠券管理", operation = "使用", description = "使用优惠券")
     @Operation(summary = "使用优惠券")
     @PostMapping("/{id}/use")
     public Result<Void> useCoupon(
@@ -185,6 +190,7 @@ public class CouponController {
         return Result.success("获取优惠券统计数据成功", stats);
     }
 
+    @Log(module = "优惠券管理", operation = "推送", description = "推送优惠券")
     @Operation(summary = "推送优惠券给用户（管理员功能）")
     @PostMapping("/push")
     public Result<Void> pushCoupon(@RequestBody CouponPushDTO dto, HttpServletRequest request) {

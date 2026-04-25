@@ -1,5 +1,6 @@
 package cn.gp.smartparking.controller;
 
+import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.entity.Blacklist;
 import cn.gp.smartparking.service.BlacklistService;
@@ -48,6 +49,7 @@ public class BlacklistController {
         return Result.success("获取黑名单详情成功", blacklist);
     }
 
+    @Log(module = "黑名单管理", operation = "添加", description = "添加黑名单")
     @Operation(summary = "添加黑名单")
     @PostMapping
     public Result<Blacklist> addBlacklist(@RequestBody Blacklist blacklist) {
@@ -55,6 +57,7 @@ public class BlacklistController {
         return Result.success("添加黑名单成功", blacklist);
     }
 
+    @Log(module = "黑名单管理", operation = "更新", description = "更新黑名单")
     @Operation(summary = "更新黑名单")
     @PutMapping("/{id}")
     public Result<Blacklist> updateBlacklist(@PathVariable Long id, @RequestBody Blacklist blacklist) {
@@ -64,6 +67,7 @@ public class BlacklistController {
         return Result.success("更新黑名单成功", updated);
     }
 
+    @Log(module = "黑名单管理", operation = "移除", description = "移除黑名单")
     @Operation(summary = "移除黑名单")
     @DeleteMapping("/{id}")
     public Result<Void> removeBlacklist(@PathVariable Long id) {
@@ -81,6 +85,7 @@ public class BlacklistController {
         return Result.success("查询车牌是否在黑名单成功", isInBlacklist);
     }
 
+    @Log(module = "黑名单管理", operation = "批量添加", description = "批量添加黑名单")
     @Operation(summary = "批量添加黑名单")
     @PostMapping("/batch")
     public Result<Void> batchAddBlacklist(@RequestBody List<Blacklist> blacklists) {

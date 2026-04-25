@@ -1,8 +1,8 @@
 package cn.gp.smartparking.controller;
 
 import cn.gp.smartparking.common.Result;
-import cn.gp.smartparking.model.entity.SysLog;
-import cn.gp.smartparking.service.SysLogService;
+import cn.gp.smartparking.model.entity.BaseSysLog;
+import cn.gp.smartparking.service.BaseSysLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -24,18 +24,18 @@ import java.util.Map;
 public class SysLogController {
 
     @Resource
-    private SysLogService sysLogService;
+    private BaseSysLogService sysLogService;
 
     @Operation(summary = "获取日志列表")
     @GetMapping("/list")
-    public Result<List<SysLog>> getLogList(
+    public Result<List<BaseSysLog>> getLogList(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate) {
         
-        List<SysLog> logs = sysLogService.lambdaQuery()
-                .eq(userId != null, SysLog::getUserId, userId)
-                .orderByDesc(SysLog::getCreateTime)
+        List<BaseSysLog> logs = sysLogService.lambdaQuery()
+                .eq(userId != null, BaseSysLog::getUserId, userId)
+                .orderByDesc(BaseSysLog::getCreateTime)
                 .list();
         
         return Result.success("获取日志列表成功", logs);
@@ -43,24 +43,24 @@ public class SysLogController {
 
     @Operation(summary = "获取日志详情")
     @GetMapping("/{id}")
-    public Result<SysLog> getLogDetail(@PathVariable Long id) {
-        SysLog log = sysLogService.getById(id);
+    public Result<BaseSysLog> getLogDetail(@PathVariable Long id) {
+        BaseSysLog log = sysLogService.getById(id);
         return Result.success("获取日志详情成功", log);
     }
 
     @Operation(summary = "记录操作日志")
     @PostMapping
-    public Result<SysLog> createLog(@RequestBody SysLog log) {
+    public Result<BaseSysLog> createLog(@RequestBody BaseSysLog log) {
         sysLogService.save(log);
         return Result.success("记录操作日志成功", log);
     }
 
     @Operation(summary = "获取用户操作日志")
     @GetMapping("/user/{userId}")
-    public Result<List<SysLog>> getUserLogs(@PathVariable Long userId) {
-        List<SysLog> logs = sysLogService.lambdaQuery()
-                .eq(SysLog::getUserId, userId)
-                .orderByDesc(SysLog::getCreateTime)
+    public Result<List<BaseSysLog>> getUserLogs(@PathVariable Long userId) {
+        List<BaseSysLog> logs = sysLogService.lambdaQuery()
+                .eq(BaseSysLog::getUserId, userId)
+                .orderByDesc(BaseSysLog::getCreateTime)
                 .list();
         return Result.success("获取用户操作日志成功", logs);
     }
@@ -91,13 +91,13 @@ public class SysLogController {
 
         // 查询总数
         long total = sysLogService.lambdaQuery()
-                .eq(userId != null, SysLog::getUserId, userId)
-                .like(content != null, SysLog::getContent, content)
+                .eq(userId != null, BaseSysLog::getUserId, userId)
+                .like(content != null, BaseSysLog::getContent, content)
                 .count();
 
         // 查询日志列表（按时间倒序）
-        List<SysLog> records = sysLogService.getBaseMapper().selectList(
-                new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<SysLog>()
+        List<BaseSysLog> records = sysLogService.getBaseMapper().selectList(
+                new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<BaseSysLog>()
                         .eq(userId != null, "user_id", userId)
                         .like(content != null, "content", content)
                         .orderByDesc("create_time")

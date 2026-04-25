@@ -7,6 +7,7 @@ import cn.gp.smartparking.algorithm.schedule.DataSimulationSchedule;
 import cn.gp.smartparking.algorithm.service.DataSimulationService;
 import cn.gp.smartparking.algorithm.service.TimeSeriesPredictorService;
 import cn.gp.smartparking.algorithm.service.WeightedRecommendationService;
+import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

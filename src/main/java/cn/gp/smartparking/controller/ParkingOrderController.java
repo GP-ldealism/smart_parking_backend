@@ -1,5 +1,6 @@
 package cn.gp.smartparking.controller;
 
+import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.dto.ParkingRecordDTO;
 import cn.gp.smartparking.model.entity.ParkingLot;
@@ -43,6 +44,7 @@ public class ParkingOrderController {
     @Resource
     private ParkingLotService parkingLotService;
 
+    @Log(module = "订单管理", operation = "创建", description = "创建停车订单")
     @Operation(summary = "创建停车订单")
     @PostMapping("create")
     @Transactional
@@ -153,6 +155,7 @@ public class ParkingOrderController {
         return Result.success("获取用户订单列表成功", orders);
     }
 
+    @Log(module = "订单管理", operation = "取消", description = "取消订单")
     @Operation(summary = "取消订单")
     @PostMapping("/{id}/cancel")
     @Transactional
@@ -189,6 +192,7 @@ public class ParkingOrderController {
         return Result.success("订单取消成功", order);
     }
 
+    @Log(module = "订单管理", operation = "完成", description = "完成订单")
     @Operation(summary = "完成订单")
     @PostMapping("/{id}/complete")
     @Transactional

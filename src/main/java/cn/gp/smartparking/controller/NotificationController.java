@@ -1,5 +1,6 @@
 package cn.gp.smartparking.controller;
 
+import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.entity.Notification;
 import cn.gp.smartparking.service.NotificationService;
@@ -55,6 +56,7 @@ public class NotificationController {
         return Result.success("获取通知详情成功", notification);
     }
 
+    @Log(module = "通知管理", operation = "创建", description = "创建通知")
     @Operation(summary = "创建通知")
     @PostMapping
     public Result<Notification> createNotification(@RequestBody Notification notification) {
@@ -62,6 +64,7 @@ public class NotificationController {
         return Result.success("创建通知成功", notification);
     }
 
+    @Log(module = "通知管理", operation = "标记已读", description = "标记通知为已读")
     @Operation(summary = "标记通知为已读")
     @PutMapping("/{id}/read")
     public Result<Void> markAsRead(@PathVariable Long id) {
@@ -74,6 +77,7 @@ public class NotificationController {
         return Result.fail("通知不存在");
     }
 
+    @Log(module = "通知管理", operation = "批量标记已读", description = "批量标记为已读")
     @Operation(summary = "批量标记为已读")
     @PutMapping("/batch/read")
     public Result<Void> batchMarkAsRead(@RequestParam List<Long> ids) {
@@ -84,6 +88,7 @@ public class NotificationController {
         return Result.success("批量标记为已读成功");
     }
 
+    @Log(module = "通知管理", operation = "删除", description = "删除通知")
     @Operation(summary = "删除通知")
     @DeleteMapping("/{id}")
     public Result<Void> deleteNotification(@PathVariable Long id) {
