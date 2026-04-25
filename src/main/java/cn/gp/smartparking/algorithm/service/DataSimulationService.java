@@ -38,7 +38,7 @@ public class DataSimulationService {
      */
     public void generateHistoricalData(int days) {
         log.info("开始生成{}天的历史停车数据", days);
-        
+
         List<ParkingLot> parkingLots = algorithmDataMapper.selectActiveParkingLots();
         if (parkingLots.isEmpty()) {
             log.warn("没有找到活跃的停车场，跳过数据生成");
@@ -47,10 +47,10 @@ public class DataSimulationService {
 
         LocalDateTime endTime = LocalDateTime.now();
         LocalDateTime startTime = endTime.minusDays(days);
-        
+
         int totalRecords = 0;
         LocalDateTime current = startTime;
-        
+
         while (current.isBefore(endTime)) {
             for (ParkingLot parkingLot : parkingLots) {
                 // 每小时生成一条记录
@@ -59,8 +59,13 @@ public class DataSimulationService {
                 totalRecords++;
             }
             current = current.plusHours(1);
+
+            // 每100条记录输出一次进度
+            if (totalRecords % 100 == 0) {
+                log.info("已插入{}条记录", totalRecords);
+            }
         }
-        
+
         log.info("数据生成完成，共生成{}条记录", totalRecords);
     }
 
@@ -71,15 +76,21 @@ public class DataSimulationService {
         ParkingUsageHistory history = new ParkingUsageHistory();
         history.setParkingLotId(parkingLot.getId());
         history.setRecordTime(java.sql.Timestamp.valueOf(time));
-        
+
         // 基于时段、星期、停车场位置等因素生成占用率
         double occupancyRate = calculateRealisticOccupancyRate(parkingLot, time);
-        
+
         history.setOccupancyRate(BigDecimal.valueOf(occupancyRate));
         history.setHour(time.getHour());
         history.setWeekday(time.getDayOfWeek().getValue());
         history.setIsHoliday(isWeekend(time) ? 1 : 0);
-        
+
+        // 设置审计字段，避免null值
+        history.setCreateBy(Long.valueOf("system"));
+        history.setUpdateBy(Long.valueOf("system"));
+        history.setCreateTime(java.sql.Timestamp.valueOf(time));
+        history.setUpdateTime(java.sql.Timestamp.valueOf(time));
+
         return history;
     }
 
@@ -192,26 +203,29 @@ public class DataSimulationService {
      */
     public void generateFutureData(int days) {
         log.info("开始生成{}天的未来预测数据", days);
-        
+
         List<ParkingLot> parkingLots = algorithmDataMapper.selectActiveParkingLots();
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusDays(days);
-        
+
         int totalRecords = 0;
         LocalDateTime current = startTime;
-        
+
         while (current.isBefore(endTime)) {
             for (ParkingLot parkingLot : parkingLots) {
                 // 生成未来数据（用于测试预测）
                 ParkingUsageHistory history = generateRealisticUsageRecord(parkingLot, current);
-                // 可以标记为预测数据
-                history.setRecordTime(java.sql.Timestamp.valueOf(current));
                 parkingUsageHistoryMapper.insert(history);
                 totalRecords++;
             }
             current = current.plusHours(1);
+
+            // 每100条记录输出一次进度
+            if (totalRecords % 100 == 0) {
+                log.info("已插入{}条记录", totalRecords);
+            }
         }
-        
+
         log.info("未来数据生成完成，共生成{}条记录", totalRecords);
     }
 

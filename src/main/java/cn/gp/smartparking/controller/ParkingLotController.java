@@ -104,6 +104,20 @@ public class ParkingLotController {
         return Result.success("获取附近停车场成功", parkingLots);
     }
 
+    @Operation(summary = "根据名称模糊搜索停车场")
+    @GetMapping("/search")
+    public Result<List<ParkingLot>> searchParkingLots(
+            @RequestParam String name,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) Double latitude) {
+        List<ParkingLot> parkingLots = parkingLotService.lambdaQuery()
+                .like(ParkingLot::getName, name)
+                .eq(ParkingLot::getStatus, 1)
+                .eq(ParkingLot::getIsDeleted, 0)
+                .list();
+        return Result.success("搜索停车场成功", parkingLots);
+    }
+
     @Operation(summary = "创建停车场（管理员功能）")
     @PostMapping
     public Result<Long> createParkingLot(@RequestBody ParkingLot parkingLot) {

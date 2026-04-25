@@ -66,7 +66,7 @@ public class WeightedRecommendationService {
         double availabilityWeight = algorithmConfig.getFreeSpaceWeight();
         double preferenceWeight = algorithmConfig.getPreferenceWeight();
         double historicalWeight = 0.15; // 历史表现权重
-        
+
         // 根据时间调整权重
         int hour = java.time.LocalDateTime.now().getHour();
         if (hour >= 7 && hour <= 9 || hour >= 17 && hour <= 19) {
@@ -90,12 +90,12 @@ public class WeightedRecommendationService {
 
         RecommendResult result = new RecommendResult();
         result.setParkingLotId(parkingLot.getId());
-        result.setParkingLotName(parkingLot.getName());
-        result.setAddress(parkingLot.getAddress());
+        result.setParkingLotName(parkingLot.getName() != null ? parkingLot.getName() : "未知停车场");
+        result.setAddress(parkingLot.getAddress() != null ? parkingLot.getAddress() : "地址未知");
         result.setDistance(calculateDistance(parkingLot, request));
-        result.setRate(parkingLot.getRate());
-        result.setFreeSpace(parkingLot.getFreeSpace());
-        result.setTotalSpace(parkingLot.getTotalSpace());
+        result.setRate(parkingLot.getRate() != null ? parkingLot.getRate() : BigDecimal.ZERO);
+        result.setFreeSpace(parkingLot.getFreeSpace() != null ? parkingLot.getFreeSpace() : 0);
+        result.setTotalSpace(parkingLot.getTotalSpace() != null ? parkingLot.getTotalSpace() : 100);
         result.setScore(Math.round(totalScore * 100.0) / 100.0);
         result.setTip(generateAdvancedTip(totalScore, parkingLot, request));
 

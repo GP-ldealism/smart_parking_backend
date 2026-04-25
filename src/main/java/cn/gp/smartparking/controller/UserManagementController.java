@@ -1,9 +1,11 @@
 package cn.gp.smartparking.controller;
 
 import cn.gp.smartparking.common.Result;
+import cn.gp.smartparking.model.entity.ParkingOrder;
 import cn.gp.smartparking.model.entity.User;
 import cn.gp.smartparking.model.entity.UserPlate;
 import cn.gp.smartparking.model.entity.UserPreference;
+import cn.gp.smartparking.service.ParkingOrderService;
 import cn.gp.smartparking.service.UserService;
 import cn.gp.smartparking.service.UserPlateService;
 import cn.gp.smartparking.service.UserPreferenceService;
@@ -38,6 +40,9 @@ public class UserManagementController {
     @Resource
     private UserPreferenceService userPreferenceService;
 
+    @Resource
+    private ParkingOrderService parkingOrderService;
+
     @Operation(summary = "获取用户信息")
     @GetMapping("/{userId}")
     public Result<User> getUserInfo(@PathVariable Long userId) {
@@ -62,6 +67,33 @@ public class UserManagementController {
                 .eq(UserPlate::getStatus, 1) // 只查询正常状态的车牌
                 .list();
         return Result.success("获取用户车牌列表成功", plates);
+    }
+
+    @Operation(summary = "获取用户可用车牌列表（排除已预约的车辆）")
+    @GetMapping("/{userId}/plates/available")
+    public Result<List<UserPlate>> getAvailablePlates(@PathVariable Long userId) {
+        // 获取用户所有正常状态的车牌
+        List<UserPlate> allPlates = userPlateService.lambdaQuery()
+                .eq(UserPlate::getUserId, userId)
+                .eq(UserPlate::getStatus, 1)
+                .list();
+        
+        // 获取用户所有进行中的订单（status=0）
+        List<String> usedPlateNumbers = parkingOrderService.lambdaQuery()
+                .eq(ParkingOrder::getUserId, userId)
+                .eq(ParkingOrder::getStatus, 0)
+                .isNotNull(ParkingOrder::getPlateNumber)
+                .list()
+                .stream()
+                .map(ParkingOrder::getPlateNumber)
+                .toList();
+        
+        // 过滤出可用车牌
+        List<UserPlate> availablePlates = allPlates.stream()
+                .filter(plate -> !usedPlateNumbers.contains(plate.getPlateNumber()))
+                .toList();
+        
+        return Result.success("获取用户可用车牌列表成功", availablePlates);
     }
 
     @Operation(summary = "添加用户车牌")

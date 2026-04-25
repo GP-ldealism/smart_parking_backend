@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-//@Mapper
+@Mapper
 public interface AlgorithmDataMapper extends BaseMapper<ParkingLot> {
 
     @Select("SELECT * FROM parking_lot WHERE status = 1 AND is_deleted = 0")
