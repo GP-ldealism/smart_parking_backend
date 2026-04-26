@@ -26,9 +26,11 @@ public class AlipayController {
     @Operation(summary = "Web端支付 - 返回HTML表单")
     @GetMapping("/web/pay")
     @ResponseBody
-    public String webPay(@RequestParam Long orderId) {
+    public String webPay(@RequestParam(required = true) Long orderId,
+                         @RequestParam(required = true) Long parkingLotId,
+                         @RequestParam(required = false) Long couponId) {
         try {
-            String payForm = payService.createWebPayOrder(orderId);
+            String payForm = payService.createWebPayOrder(orderId, parkingLotId, couponId);
             if (payForm != null) {
                 return payForm;
             } else {
@@ -44,9 +46,9 @@ public class AlipayController {
     @Operation(summary = "移动端APP支付 - 返回orderString")
     @PostMapping("/mobile/pay")
     @ResponseBody
-    public Result<String> mobilePay(@RequestParam Long orderId) {
+    public Result<String> mobilePay(@RequestParam Long orderId, @RequestParam Long parkingLotId) {
         try {
-            String orderString = payService.createMobilePayOrder(orderId);
+            String orderString = payService.createMobilePayOrder(orderId, parkingLotId);
             if (orderString != null) {
                 return Result.success("获取APP支付订单成功", orderString);
             } else {
@@ -108,12 +110,14 @@ public class AlipayController {
             log.info("交易状态: {}", tradeStatus);
 
             if ("TRADE_SUCCESS".equals(tradeStatus) || "TRADE_FINISHED".equals(tradeStatus)) {
-                return "redirect:http://localhost:9003/#/paysuccess?tradeNo=" + out_trade_no;
+//                return "redirect:http://localhost:9003/#/paysuccess?tradeNo=" + out_trade_no;
+                return "redirect:http://localhost:5173/";
             }
         } catch (Exception e) {
             log.error("处理支付回调异常", e);
         }
-        return "redirect:http://localhost:9003/#/payfail";
+//        return "redirect:http://localhost:9003/#/payfail";
+        return "redirect:http://localhost:5173/payfail";
     }
 
 }

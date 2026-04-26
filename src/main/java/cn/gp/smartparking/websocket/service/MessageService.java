@@ -275,26 +275,29 @@ public class MessageService {
     }
 
     /**
-     * 向所有车主推送优惠券消息
+     * 向所有车主推送优惠券消息（排除管理员）
      */
     public void broadcastCouponNotification(Object couponData) {
         log.info("开始广播优惠券消息: couponData={}", couponData);
-        
+
         try {
-            // 获取所有用户
-            List<User> allUsers = userService.list();
-            log.info("系统总用户数量: {}", allUsers.size());
-            
+            // 获取所有非管理员用户（role == 0 表示车主）
+            List<User> allUsers = userService.lambdaQuery()
+                    .eq(User::getRole, 0)
+                    .eq(User::getIsDeleted, 0)
+                    .list();
+            log.info("非管理员用户数量: {}", allUsers.size());
+
             // 为每个用户发送消息（在线用户直接推送，离线用户保存到notification表）
             for (User user : allUsers) {
                 WebSocketMessage userMessage = new WebSocketMessage(
-                    WebSocketMessage.MessageType.COUPON_NOTIFICATION, 
-                    couponData, 
+                    WebSocketMessage.MessageType.COUPON_NOTIFICATION,
+                    couponData,
                     user.getId()
                 );
                 sendMessageToUser(user.getId(), userMessage);
             }
-            
+
             log.info("向所有车主广播优惠券消息成功");
         } catch (Exception e) {
             log.error("向所有车主广播优惠券消息异常", e);

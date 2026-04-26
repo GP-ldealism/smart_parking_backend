@@ -32,6 +32,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/prediction/**",
                         "/algorithm/prediction/**",
                         "/alipay/**",
+                        "/api/alipay/**",
                         "/main/**",
                         "/error"
                 );

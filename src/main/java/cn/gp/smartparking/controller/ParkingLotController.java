@@ -69,7 +69,10 @@ public class ParkingLotController {
         response.put("total", total);
         response.put("current", page);
         response.put("size", size);
-        
+
+        // 批量计算车位统计信息
+        parkingLotService.calculateSpaceStatsForList(records);
+
         return Result.success("获取停车场列表成功", response);
     }
     
@@ -95,17 +98,32 @@ public class ParkingLotController {
     @Operation(summary = "获取停车场详情")
     @GetMapping("/{id}")
     public Result<ParkingLot> getParkingLotDetail(@PathVariable Long id) {
-        ParkingLot parkingLot = parkingLotService.getById(id);
+        ParkingLot parkingLot = parkingLotService.calculateSpaceStats(id);
         return Result.success("获取停车场详情成功", parkingLot);
     }
 
     @Operation(summary = "获取停车场车位状态")
     @GetMapping("/{id}/spaces")
-    public Result<List<ParkingSpace>> getParkingSpaces(@PathVariable Long id) {
-        List<ParkingSpace> spaces = parkingSpaceService.lambdaQuery()
-                .eq(ParkingSpace::getParkingLotId, id)
-                .list();
-        return Result.success("获取车位状态成功", spaces);
+    public Result<java.util.Map<String, Object>> getParkingSpaces(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "1") Integer current,
+            @RequestParam(defaultValue = "10") Integer size) {
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ParkingSpace> page = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(current, size);
+        com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<ParkingSpace> wrapper = new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
+
+        wrapper.eq(ParkingSpace::getParkingLotId, id);
+        wrapper.eq(ParkingSpace::getIsDeleted, 0);
+        wrapper.orderByAsc(ParkingSpace::getSpaceNo);
+
+        com.baomidou.mybatisplus.core.metadata.IPage<ParkingSpace> result = parkingSpaceService.page(page, wrapper);
+
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("records", result.getRecords());
+        response.put("total", result.getTotal());
+        response.put("current", result.getCurrent());
+        response.put("size", result.getSize());
+
+        return Result.success("获取车位状态成功", response);
     }
 
     @Operation(summary = "获取停车场空闲车位")
@@ -128,6 +146,8 @@ public class ParkingLotController {
         List<ParkingLot> parkingLots = parkingLotService.lambdaQuery()
                 .eq(ParkingLot::getStatus, 1) // 只查询正常运营的停车场
                 .list();
+        // 动态计算车位统计信息
+        parkingLotService.calculateSpaceStatsForList(parkingLots);
         return Result.success("获取附近停车场成功", parkingLots);
     }
 
@@ -142,6 +162,8 @@ public class ParkingLotController {
                 .eq(ParkingLot::getStatus, 1)
                 .eq(ParkingLot::getIsDeleted, 0)
                 .list();
+        // 动态计算车位统计信息
+        parkingLotService.calculateSpaceStatsForList(parkingLots);
         return Result.success("搜索停车场成功", parkingLots);
     }
 

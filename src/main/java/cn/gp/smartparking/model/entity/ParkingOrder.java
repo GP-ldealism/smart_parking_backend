@@ -73,6 +73,11 @@ public class ParkingOrder implements Serializable {
     private BigDecimal amount;
 
     /**
+     * 实付金额
+     */
+    private BigDecimal actualAmount;
+
+    /**
      * 0=待进场 1=已完成 2=已取消
      */
     private Integer status;
@@ -106,6 +111,11 @@ public class ParkingOrder implements Serializable {
      * 关联支付记录ID
      */
     private Long paymentId;
+
+    /**
+     * 关联优惠券ID
+     */
+    private Long couponId;
 
     /**
      * 评价分数 1-5

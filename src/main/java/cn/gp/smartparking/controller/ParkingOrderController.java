@@ -44,6 +44,9 @@ public class ParkingOrderController {
     @Resource
     private ParkingLotService parkingLotService;
 
+    @Resource
+    private cn.gp.smartparking.service.ParkingLotService parkingLotEntityService;
+
     @Log(module = "订单管理", operation = "创建", description = "创建停车订单")
     @Operation(summary = "创建停车订单")
     @PostMapping("create")
@@ -227,8 +230,8 @@ public class ParkingOrderController {
         return Result.success("订单取消成功", order);
     }
 
-    @Log(module = "订单管理", operation = "完成", description = "完成订单")
-    @Operation(summary = "完成订单")
+    @Log(module = "订单管理", operation = "完成", description = "完成订单（管理员手动完成）")
+    @Operation(summary = "完成订单（管理员手动完成）")
     @PostMapping("/{id}/complete")
     @Transactional
     public Result<ParkingOrder> completeOrder(@PathVariable Long id) {
@@ -239,39 +242,121 @@ public class ParkingOrderController {
         if (order.getStatus() != 0) { // 只有待进场状态可以完成
             return Result.fail("订单状态不允许完成");
         }
-        
+
         // 设置结束时间为当前时间
         Date now = new Date();
         order.setEndTime(now);
-        
+
         // 计算停车时长（分钟）
         if (order.getStartTime() != null) {
             long durationMillis = now.getTime() - order.getStartTime().getTime();
             int durationMinutes = (int) (durationMillis / (60 * 1000));
             order.setDurationMinutes(durationMinutes);
-            
-            // 计算费用：30分钟以内0元，超过30分钟4元/小时
-            double amount = calculateAmount(durationMinutes);
+
+            // 计算费用：30分钟以内0元，超过30分钟按停车场单价/小时，24h封顶为单价8倍
+            double amount = calculateAmount(order.getStartTime(), now, order.getParkingLotId());
             order.setAmount(java.math.BigDecimal.valueOf(amount));
         }
-        
+
         order.setStatus((int) 1); // 1表示已完成
         parkingOrderService.updateById(order);
         return Result.success("订单完成成功", order);
+    }
+
+    @Log(module = "订单管理", operation = "完成并结算", description = "完成订单并结算（用户支付）")
+    @Operation(summary = "完成订单并结算（用户支付）")
+    @PostMapping("/{id}/completeAndPay")
+    public Result<String> completeAndPay(@PathVariable Long id, @RequestParam(required = false) Long couponId) {
+        ParkingOrder order = parkingOrderService.getById(id);
+        if (order == null) {
+            return Result.fail("订单不存在");
+        }
+        if (order.getStatus() != 0) { // 只有待进场状态可以完成并结算
+            return Result.fail("订单状态不允许完成");
+        }
+
+        // 设置结束时间为当前时间
+        Date now = new Date();
+        order.setEndTime(now);
+
+        // 计算停车时长（分钟）
+        if (order.getStartTime() != null) {
+            long durationMillis = now.getTime() - order.getStartTime().getTime();
+            int durationMinutes = (int) (durationMillis / (60 * 1000));
+            order.setDurationMinutes(durationMinutes);
+
+            // 计算费用：30分钟以内0元，超过30分钟按停车场单价/小时，24h封顶为单价8倍
+            double amount = calculateAmount(order.getStartTime(), now, order.getParkingLotId());
+            order.setAmount(java.math.BigDecimal.valueOf(amount));
+
+            // 如果金额为0，直接完成订单，不需要支付
+            if (amount == 0.0) {
+                order.setStatus(1); // 直接标记为已完成
+                order.setActualAmount(java.math.BigDecimal.ZERO);
+                parkingOrderService.updateById(order);
+                return Result.success("订单完成成功（免费）", null);
+            }
+        }
+
+        // 如果有优惠券，先保存到订单中
+        if (couponId != null) {
+            order.setCouponId(couponId);
+        }
+
+        parkingOrderService.updateById(order);
+
+        // 返回支付宝支付页面URL
+        String payUrl = "http://localhost:9003/smart-parking/api/alipay/web/pay?orderId=" + id + "&parkingLotId=" + order.getParkingLotId();
+        if (couponId != null) {
+            payUrl += "&couponId=" + couponId;
+        }
+
+        return Result.success("订单完成成功，请进行支付", payUrl);
     }
     
     /**
      * 计算停车费用
      * 30分钟以内（含30分钟）：0元
-     * 超过30分钟：4元/小时
+     * 超过30分钟：按停车场单价/小时，不足1小时按1小时计算
+     * 每24小时封顶：单价8倍
+     * 计算方式：从startTime开始，每24小时为一个周期，每个周期封顶为单价8倍
      */
-    private double calculateAmount(int durationMinutes) {
+    private double calculateAmount(Date startTime, Date endTime, Long parkingLotId) {
+        // 获取停车场单价
+        cn.gp.smartparking.model.entity.ParkingLot parkingLot = parkingLotEntityService.getById(parkingLotId);
+        if (parkingLot == null || parkingLot.getRate() == null) {
+            System.err.println("停车场不存在或单价未设置 - parkingLotId: " + parkingLotId);
+            return 0.0;
+        }
+
+        double hourlyRate = parkingLot.getRate().doubleValue();
+        double dailyCap = hourlyRate * 8; // 24小时封顶为单价8倍
+
+        long durationMillis = endTime.getTime() - startTime.getTime();
+        int durationMinutes = (int) (durationMillis / (60 * 1000));
+
         if (durationMinutes <= 30) {
             return 0.0;
         }
-        // 超过30分钟，按小时计费，不足1小时按1小时计算
-        int hours = (int) Math.ceil((durationMinutes - 30) / 60.0);
-        return hours * 4.0;
+
+        // 计算跨越的完整24小时周期数
+        int full24HourPeriods = durationMinutes / (24 * 60);
+        int remainingMinutes = durationMinutes % (24 * 60);
+
+        double totalAmount = 0.0;
+
+        // 每个完整24小时周期按封顶价格计算
+        totalAmount += full24HourPeriods * dailyCap;
+
+        // 剩余不足24小时的部分按小时计算
+        if (remainingMinutes > 30) {
+            int remainingHours = (int) Math.ceil((remainingMinutes - 30) / 60.0);
+            double remainingAmount = remainingHours * hourlyRate;
+            // 剩余部分也要封顶
+            totalAmount += Math.min(remainingAmount, dailyCap);
+        }
+
+        return totalAmount;
     }
 
     @Operation(summary = "获取停车场订单列表")

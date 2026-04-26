@@ -107,10 +107,11 @@ ALTER TABLE parking_order
     ADD COLUMN actual_duration_minutes INT COMMENT '实际停车时长',
     ADD COLUMN cancel_reason VARCHAR(256) COMMENT '取消原因',
     ADD COLUMN cancel_time DATETIME COMMENT '取消时间',
-    ADD COLUMN payment_id BIGINT COMMENT '关联支付记录ID',
     ADD COLUMN review_score TINYINT COMMENT '评价分数 1-5',
     ADD COLUMN review_content VARCHAR(512) COMMENT '评价内容',
     ADD COLUMN review_time DATETIME COMMENT '评价时间';
+ALTER TABLE parking_order ADD COLUMN coupon_id BIGINT COMMENT '关联优惠券ID';
+alter table parking_order add actual_amount DECIMAL(8,2) COMMENT '实付金额';
 
 drop table if exists `parking_usage_history`;
 -- 5. 车位占用历史表（预测用）

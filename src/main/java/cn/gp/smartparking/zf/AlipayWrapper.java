@@ -20,7 +20,7 @@ public class AlipayWrapper {
     private static final String GATEWAY_URL = "https://openapi-sandbox.dl.alipaydev.com/gateway.do";
     private static final String FORMAT = "JSON";
     private static final String SIGN_TYPE = "RSA2";
-    private static final String NOTIFY_URL = "http://t247faad.natappfree.cc/smart-parking/api/alipay/notify";
+    private static final String NOTIFY_URL = "http://pb4d8db4.natappfree.cc/smart-parking/api/alipay/notify";
     private static final String RETURN_URL_WEB = "http://localhost:9003/smart-parking/api/alipay/return";
     private static final String RETURN_URL_MOBILE = "http://localhost:9003/smart-parking/api/alipay/mobile/return";
 
