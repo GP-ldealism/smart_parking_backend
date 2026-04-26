@@ -10,6 +10,7 @@ import cn.gp.smartparking.algorithm.service.WeightedRecommendationService;
 import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +24,9 @@ public class AlgorithmController {
     private final WeightedRecommendationService weightedRecommendationService;
     private final TimeSeriesPredictorService timeSeriesPredictorService;
     private final DataSimulationService dataSimulationService;
-    private final DataSimulationSchedule dataSimulationSchedule;
+
+    @Autowired(required = false)
+    private DataSimulationSchedule dataSimulationSchedule;
 
     @PostMapping("/recommend")
     public Result<List<RecommendResult>> recommend(@RequestBody RecommendRequest request) {

@@ -70,11 +70,13 @@ public class ParkingLot implements Serializable {
     /**
      * 用户评分
      */
+    @TableField(exist = false)
     private BigDecimal rating;
 
     /**
      * 评价数量
      */
+    @TableField(exist = false)
     private Integer reviewCount;
 
     /**

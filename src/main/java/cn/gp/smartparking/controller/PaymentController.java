@@ -4,13 +4,16 @@ import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.entity.PaymentRecord;
 import cn.gp.smartparking.service.PaymentRecordService;
+import cn.gp.smartparking.service.ParkingOrderService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/payment")
@@ -27,13 +31,8 @@ public class PaymentController {
     @Resource
     private PaymentRecordService paymentRecordService;
 
-    @Log(module = "支付管理", operation = "创建", description = "创建支付记录")
-    @Operation(summary = "创建支付记录")
-    @PostMapping
-    public Result<PaymentRecord> createPayment(@RequestBody PaymentRecord paymentRecord) {
-        paymentRecordService.save(paymentRecord);
-        return Result.success("创建支付记录成功", paymentRecord);
-    }
+    @Resource
+    private ParkingOrderService parkingOrderService;
 
     @Operation(summary = "获取支付记录详情")
     @GetMapping("/{id}")
@@ -46,7 +45,7 @@ public class PaymentController {
     @GetMapping("/order/{orderId}")
     public Result<PaymentRecord> getPaymentByOrderId(@PathVariable Long orderId) {
         PaymentRecord paymentRecord = paymentRecordService.lambdaQuery()
-                .eq(PaymentRecord::getOrderId, orderId)
+                .eq(PaymentRecord::getParkingOrderId, orderId)
                 .one();
         return Result.success("根据订单ID查询支付记录成功", paymentRecord);
     }
@@ -54,8 +53,23 @@ public class PaymentController {
     @Operation(summary = "获取用户支付记录列表")
     @GetMapping("/user")
     public Result<List<PaymentRecord>> getUserPayments(@RequestParam Long userId) {
+        // 先查询该用户的所有订单ID
+        List<Long> orderIds = parkingOrderService.lambdaQuery()
+                .eq(cn.gp.smartparking.model.entity.ParkingOrder::getUserId, userId)
+                .eq(cn.gp.smartparking.model.entity.ParkingOrder::getIsDeleted, 0)
+                .list()
+                .stream()
+                .map(cn.gp.smartparking.model.entity.ParkingOrder::getId)
+                .collect(Collectors.toList());
+
+        if (orderIds.isEmpty()) {
+            return Result.success("获取用户支付记录列表成功", List.of());
+        }
+
+        // 根据订单ID查询支付记录
         List<PaymentRecord> payments = paymentRecordService.lambdaQuery()
-                .eq(PaymentRecord::getCreateBy, userId)
+                .in(PaymentRecord::getParkingOrderId, orderIds)
+                .eq(PaymentRecord::getIsDeleted, 0)
                 .orderByDesc(PaymentRecord::getCreateTime)
                 .list();
         return Result.success("获取用户支付记录列表成功", payments);
@@ -76,63 +90,53 @@ public class PaymentController {
         return Result.fail("支付记录不存在");
     }
 
-    @Operation(summary = "获取支付统计")
-    @GetMapping("/statistics")
-    public Result<Object> getPaymentStatistics(
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate) {
-        // 这里简化处理，实际应该根据日期范围查询统计数据
-        // 可以统计总金额、成功支付数、失败支付数等
-        Object statistics = new Object(); // 实际应该返回统计数据对象
-        return Result.success("获取支付统计成功", statistics);
-    }
-
     @Operation(summary = "查询支付记录列表")
     @GetMapping("/list")
     public Result<List<PaymentRecord>> getPaymentList(
             @RequestParam(required = false) Byte paymentStatus,
             @RequestParam(required = false) Byte paymentMethod) {
-        
+
         List<PaymentRecord> payments = paymentRecordService.lambdaQuery()
                 .eq(paymentStatus != null, PaymentRecord::getPaymentStatus, paymentStatus)
                 .eq(paymentMethod != null, PaymentRecord::getPaymentMethod, paymentMethod)
                 .orderByDesc(PaymentRecord::getCreateTime)
                 .list();
-        
+
         return Result.success("查询支付记录列表成功", payments);
     }
 
     @Operation(summary = "分页查询支付记录列表（管理员功能）")
     @GetMapping("/page")
     public Result<Map<String, Object>> getPaymentPage(
-            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "1") Integer current,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) Integer paymentStatus,
             @RequestParam(required = false) Integer paymentMethod,
             @RequestParam(required = false) Long orderId) {
 
-        int offset = (page - 1) * size;
+        Page<PaymentRecord> page = new Page<>(current, size);
+        LambdaQueryWrapper<PaymentRecord> wrapper = new LambdaQueryWrapper<>();
 
-        long total = paymentRecordService.lambdaQuery()
-                .eq(paymentStatus != null, PaymentRecord::getPaymentStatus, paymentStatus)
-                .eq(paymentMethod != null, PaymentRecord::getPaymentMethod, paymentMethod)
-                .eq(orderId != null, PaymentRecord::getOrderId, orderId)
-                .count();
+        if (paymentStatus != null) {
+            wrapper.eq(PaymentRecord::getPaymentStatus, paymentStatus);
+        }
+        if (paymentMethod != null) {
+            wrapper.eq(PaymentRecord::getPaymentMethod, paymentMethod);
+        }
+        if (orderId != null) {
+            wrapper.eq(PaymentRecord::getParkingOrderId, orderId);
+        }
 
-        List<PaymentRecord> records = paymentRecordService.getBaseMapper().selectList(
-                new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<PaymentRecord>()
-                        .eq(paymentStatus != null, "payment_status", paymentStatus)
-                        .eq(paymentMethod != null, "payment_method", paymentMethod)
-                        .eq(orderId != null, "order_id", orderId)
-                        .orderByDesc("create_time")
-                        .last("LIMIT " + size + " OFFSET " + offset)
-        );
+        wrapper.eq(PaymentRecord::getIsDeleted, 0);
+        wrapper.orderByDesc(PaymentRecord::getCreateTime);
+
+        IPage<PaymentRecord> result = paymentRecordService.page(page, wrapper);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("records", records);
-        response.put("total", total);
-        response.put("current", page);
-        response.put("size", size);
+        response.put("records", result.getRecords());
+        response.put("total", result.getTotal());
+        response.put("current", result.getCurrent());
+        response.put("size", result.getSize());
 
         return Result.success("查询支付记录分页列表成功", response);
     }
@@ -143,14 +147,19 @@ public class PaymentController {
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate) {
 
-        long totalCount = paymentRecordService.count();
+        long totalCount = paymentRecordService.lambdaQuery()
+                .eq(PaymentRecord::getIsDeleted, 0)
+                .count();
         long successCount = paymentRecordService.lambdaQuery()
+                .eq(PaymentRecord::getIsDeleted, 0)
                 .eq(PaymentRecord::getPaymentStatus, 1)
                 .count();
         long pendingCount = paymentRecordService.lambdaQuery()
+                .eq(PaymentRecord::getIsDeleted, 0)
                 .eq(PaymentRecord::getPaymentStatus, 0)
                 .count();
         long failedCount = paymentRecordService.lambdaQuery()
+                .eq(PaymentRecord::getIsDeleted, 0)
                 .eq(PaymentRecord::getPaymentStatus, 2)
                 .count();
 

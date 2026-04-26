@@ -1,6 +1,7 @@
 package cn.gp.smartparking.controller;
 
 import cn.gp.smartparking.annotation.Log;
+import cn.gp.smartparking.common.PageRequest;
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.entity.ParkingLot;
 import cn.gp.smartparking.model.entity.ParkingSpace;
@@ -10,15 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +32,9 @@ public class ParkingLotController {
     @GetMapping("/list")
     public Result<Map<String, Object>> getParkingLotList(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) String sortField,
+            @RequestParam(required = false) String sortOrder) {
         // 查询总数
         long total = parkingLotService.lambdaQuery()
                 .eq(ParkingLot::getIsDeleted, 0)
@@ -48,12 +43,24 @@ public class ParkingLotController {
         // 计算偏移量
         int offset = (page - 1) * size;
         
+        // 构建查询条件
+        var queryWrapper = Wrappers.query(new ParkingLot())
+                .eq("is_deleted", 0);
+        
+        // 处理排序
+        if (sortField != null && !sortField.isEmpty()) {
+            // 将驼峰命名转换为下划线命名
+            String dbField = camelToUnderscore(sortField);
+            String orderSql = "ascend".equals(sortOrder) ? "ASC" : "DESC";
+            queryWrapper.last("ORDER BY " + dbField + " " + orderSql);
+        } else {
+            // 默认按ID升序
+            queryWrapper.orderByAsc("id");
+        }
+        
         // 使用原生SQL查询分页数据
         List<ParkingLot> records = parkingLotService.getBaseMapper().selectList(
-                Wrappers.query(new ParkingLot())
-                        .eq("is_deleted", 0)
-                        .orderByAsc("id")
-                        .last("LIMIT " + size + " OFFSET " + offset)
+                queryWrapper.last("LIMIT " + size + " OFFSET " + offset)
         );
         
         // 构建返回结果
@@ -64,6 +71,25 @@ public class ParkingLotController {
         response.put("size", size);
         
         return Result.success("获取停车场列表成功", response);
+    }
+    
+    /**
+     * 驼峰命名转下划线命名
+     */
+    private String camelToUnderscore(String camelCase) {
+        if (camelCase == null || camelCase.isEmpty()) {
+            return camelCase;
+        }
+        StringBuilder underscore = new StringBuilder();
+        for (int i = 0; i < camelCase.length(); i++) {
+            char c = camelCase.charAt(i);
+            if (Character.isUpperCase(c)) {
+                underscore.append('_').append(Character.toLowerCase(c));
+            } else {
+                underscore.append(c);
+            }
+        }
+        return underscore.toString();
     }
 
     @Operation(summary = "获取停车场详情")
@@ -83,7 +109,7 @@ public class ParkingLotController {
     }
 
     @Operation(summary = "获取停车场空闲车位")
-    @GetMapping("/{id}/free-spaces")
+    @GetMapping("/{id}/freeSpaces")
     public Result<List<ParkingSpace>> getFreeSpaces(@PathVariable Long id) {
         List<ParkingSpace> freeSpaces = parkingSpaceService.lambdaQuery()
                 .eq(ParkingSpace::getParkingLotId, id)

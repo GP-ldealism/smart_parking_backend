@@ -213,30 +213,6 @@ CREATE TABLE user_plate (
                             INDEX idx_plate (plate_number)
 ) COMMENT='用户车牌表';
 
-drop table if exists `payment_record`;
--- 10. 支付记录表
-CREATE TABLE payment_record (
-                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
-
-                                order_id BIGINT NOT NULL COMMENT '订单ID',
-                                payment_no VARCHAR(64) NOT NULL UNIQUE COMMENT '支付流水号',
-                                amount DECIMAL(8,2) NOT NULL COMMENT '支付金额',
-                                payment_method TINYINT NOT NULL COMMENT '0=微信 1=支付宝 2=余额',
-                                payment_status TINYINT DEFAULT 0 COMMENT '0=待支付 1=成功 2=失败',
-                                transaction_id VARCHAR(128) COMMENT '第三方交易号',
-                                payment_time DATETIME COMMENT '支付完成时间',
-
-                                version INT DEFAULT 0 COMMENT '乐观锁',
-                                create_by BIGINT COMMENT '创建人ID',
-                                create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                update_by BIGINT COMMENT '更新人ID',
-                                update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                is_deleted TINYINT DEFAULT 0 COMMENT '0=未删除 1=已删除',
-
-                                INDEX idx_order_id (order_id),
-                                INDEX idx_payment_no (payment_no)
-) COMMENT='支付记录表';
-
 drop table if exists `notification`;
 -- 11. 消息通知表
 CREATE TABLE notification (
@@ -329,3 +305,29 @@ CREATE TABLE parking_review (
     INDEX idx_lot_id (parking_lot_id),
     INDEX idx_user_id (user_id)
 ) COMMENT='停车场评价表';
+
+# 已移除已移除，相关字段可以加在parking_order表中
+drop table if exists `payment_record`;
+-- 10. 支付记录表
+CREATE TABLE payment_record (
+                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+                                order_id BIGINT NOT NULL COMMENT '订单ID',
+                                payment_no VARCHAR(64) NOT NULL UNIQUE COMMENT '支付流水号',
+                                amount DECIMAL(8,2) NOT NULL COMMENT '支付金额',
+                                payment_method TINYINT NOT NULL COMMENT '0=微信 1=支付宝 2=余额 3=其他',
+                                payment_status TINYINT DEFAULT 0 COMMENT '0=待支付 1=成功 2=失败',
+                                transaction_id VARCHAR(128) COMMENT '第三方交易号',
+                                payment_time DATETIME COMMENT '支付完成时间',
+
+                                version INT DEFAULT 0 COMMENT '乐观锁',
+                                create_by BIGINT COMMENT '创建人ID',
+                                create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                update_by BIGINT COMMENT '更新人ID',
+                                update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                is_deleted TINYINT DEFAULT 0 COMMENT '0=未删除 1=已删除',
+
+                                INDEX idx_order_id (order_id),
+                                INDEX idx_payment_no (payment_no)
+) COMMENT='支付记录表';
+alter table payment_record change order_id parking_order_id BIGINT NOT NULL COMMENT '订单ID';

@@ -1,6 +1,7 @@
 package cn.gp.smartparking.controller;
 
 import cn.gp.smartparking.common.Result;
+import cn.gp.smartparking.model.dto.RecommendationResultDTO;
 import cn.gp.smartparking.model.entity.ParkingLot;
 import cn.gp.smartparking.model.entity.UserPreference;
 import cn.gp.smartparking.service.ParkingLotService;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -37,13 +39,13 @@ public class RecommendationController {
 
     @Operation(summary = "基于用户偏好的车位推荐")
     @GetMapping("/parkingLots")
-    public Result<List<ParkingLot>> recommendParkingLots(
+    public Result<List<RecommendationResultDTO>> recommendParkingLots(
             @RequestParam("longitude") Double longitude,
             @RequestParam("latitude") Double latitude,
             @RequestParam(required = false) Long userId) {
         log.info("收到推荐请求 - longitude: {}, latitude: {}, userId: {}",
                 longitude, latitude, userId);
-        
+
         // 获取所有正常运营的停车场
         List<ParkingLot> parkingLots = parkingLotService.lambdaQuery()
                 .eq(ParkingLot::getStatus, 1)
@@ -57,20 +59,46 @@ public class RecommendationController {
                     .one();
         }
 
-        // 计算每个停车场的推荐分数
-        List<RecommendedParkingLot> recommendedList = new ArrayList<>();
+        // 计算每个停车场的推荐分数并构建推荐结果
+        List<RecommendationResultDTO> recommendationResults = new ArrayList<>();
         for (ParkingLot lot : parkingLots) {
+            double distance = calculateDistance(lot, longitude, latitude);
+            
+            // 过滤掉距离超过50公里的停车场
+            if (distance > 50000) {
+                continue;
+            }
+            
             double score = calculateRecommendationScore(lot, longitude, latitude, preference);
-            recommendedList.add(new RecommendedParkingLot(lot, score));
+            double freeSpaceRate = calculateFreeSpaceRate(lot);
+            String reason = generateRecommendationReason(lot, distance, freeSpaceRate, score);
+            
+            RecommendationResultDTO dto = new RecommendationResultDTO();
+            dto.setId(lot.getId());
+            dto.setName(lot.getName());
+            dto.setAddress(lot.getAddress());
+            dto.setLongitude(lot.getLongitude());
+            dto.setLatitude(lot.getLatitude());
+            dto.setTotalSpace(lot.getTotalSpace());
+            dto.setFreeSpace(lot.getFreeSpace());
+            dto.setRate(lot.getRate());
+            dto.setOpenTime(lot.getOpenTime());
+            dto.setStatus(lot.getStatus());
+            dto.setScore(score * 100); // 转换为0-100分
+            dto.setDistance(distance);
+            dto.setFreeSpaceRate(freeSpaceRate);
+            dto.setReason(reason);
+            
+            recommendationResults.add(dto);
         }
 
         // 按推荐分数排序
-        recommendedList.sort(Comparator.comparingDouble(RecommendedParkingLot::getScore).reversed());
+        recommendationResults.sort(Comparator.comparingDouble(RecommendationResultDTO::getScore).reversed());
 
-        // 提取排序后的停车场列表
-        List<ParkingLot> result = recommendedList.stream()
-                .map(RecommendedParkingLot::getParkingLot)
-                .toList();
+        // 只返回前10个推荐结果
+        List<RecommendationResultDTO> result = recommendationResults.stream()
+                .limit(10)
+                .collect(Collectors.toList());
 
         return Result.success("推荐成功", result);
     }
@@ -81,22 +109,22 @@ public class RecommendationController {
     private double calculateRecommendationScore(ParkingLot lot, Double longitude, Double latitude, UserPreference preference) {
         double score = 0.0;
 
-        // 1. 距离因素（30%权重）
+        // 1. 距离因素（50%权重）- 提高距离权重
         double distanceScore = calculateDistanceScore(lot, longitude, latitude);
-        score += distanceScore * 0.3;
+        score += distanceScore * 0.5;
 
-        // 2. 空闲车位因素（30%权重）
+        // 2. 空闲车位因素（25%权重）
         double freeSpaceScore = calculateFreeSpaceScore(lot);
-        score += freeSpaceScore * 0.3;
+        score += freeSpaceScore * 0.25;
 
-        // 3. 价格因素（20%权重）
+        // 3. 价格因素（15%权重）
         double priceScore = calculatePriceScore(lot);
-        score += priceScore * 0.2;
+        score += priceScore * 0.15;
 
-        // 4. 用户偏好因素（20%权重）
+        // 4. 用户偏好因素（10%权重）
         if (preference != null) {
             double preferenceScore = calculatePreferenceScore(lot, preference);
-            score += preferenceScore * 0.2;
+            score += preferenceScore * 0.1;
         }
 
         return score;
@@ -109,6 +137,44 @@ public class RecommendationController {
         if (lot.getLongitude() == null || lot.getLatitude() == null) {
             return 0.5; // 默认中等分数
         }
+
+        // 计算欧几里得距离（简化处理）
+        double distance = Math.sqrt(
+                Math.pow(lot.getLongitude().doubleValue() - longitude, 2) +
+                Math.pow(lot.getLatitude().doubleValue() - latitude, 2)
+        );
+
+        // 转换为米（1度约111公里）
+        double distanceInMeters = distance * 111000;
+
+        // 使用指数衰减函数，距离越近分数越高
+        // 1公里内：1.0分
+        // 5公里内：0.8分
+        // 10公里内：0.6分
+        // 20公里内：0.4分
+        // 50公里内：0.2分
+        if (distanceInMeters <= 1000) {
+            return 1.0;
+        } else if (distanceInMeters <= 5000) {
+            return 0.8;
+        } else if (distanceInMeters <= 10000) {
+            return 0.6;
+        } else if (distanceInMeters <= 20000) {
+            return 0.4;
+        } else if (distanceInMeters <= 50000) {
+            return 0.2;
+        } else {
+            return 0.0;
+        }
+    }
+
+    /**
+     * 计算实际距离（米）
+     */
+    private double calculateDistance(ParkingLot lot, Double longitude, Double latitude) {
+        if (lot.getLongitude() == null || lot.getLatitude() == null) {
+            return 0.0;
+        }
         
         // 计算欧几里得距离（简化处理）
         double distance = Math.sqrt(
@@ -116,9 +182,51 @@ public class RecommendationController {
                 Math.pow(lot.getLatitude().doubleValue() - latitude, 2)
         );
         
-        // 距离越近分数越高（最大距离设为1度约111公里）
-        double maxDistance = 0.1; // 约11公里
-        return Math.max(0, 1 - distance / maxDistance);
+        // 转换为米（1度约111公里）
+        return distance * 111000;
+    }
+
+    /**
+     * 计算空闲率
+     */
+    private double calculateFreeSpaceRate(ParkingLot lot) {
+        if (lot.getTotalSpace() == null || lot.getTotalSpace() == 0) {
+            return 0.0;
+        }
+        return (double) lot.getFreeSpace() / lot.getTotalSpace();
+    }
+
+    /**
+     * 生成推荐理由
+     */
+    private String generateRecommendationReason(ParkingLot lot, double distance, double freeSpaceRate, double score) {
+        List<String> reasons = new ArrayList<>();
+        
+        // 距离因素
+        if (distance <= 500) {
+            reasons.add("距离最近");
+        } else if (distance <= 1000) {
+            reasons.add("距离较近");
+        }
+        
+        // 价格因素
+        if (lot.getRate() != null && lot.getRate().doubleValue() <= 8) {
+            reasons.add("价格实惠");
+        }
+        
+        // 空闲车位因素
+        if (freeSpaceRate >= 0.5) {
+            reasons.add("空闲车位充足");
+        } else if (freeSpaceRate >= 0.3) {
+            reasons.add("空闲车位较多");
+        }
+        
+        // 综合评分因素
+        if (score >= 0.8) {
+            reasons.add("综合评分高");
+        }
+        
+        return reasons.isEmpty() ? "推荐停车场" : String.join(" · ", reasons);
     }
 
     /**
@@ -150,26 +258,5 @@ public class RecommendationController {
         // 这里简化处理，实际应该查询该停车场是否有用户偏好的车位类型
         
         return score;
-    }
-
-    /**
-     * 推荐停车场内部类
-     */
-    private static class RecommendedParkingLot {
-        private ParkingLot parkingLot;
-        private double score;
-
-        public RecommendedParkingLot(ParkingLot parkingLot, double score) {
-            this.parkingLot = parkingLot;
-            this.score = score;
-        }
-
-        public ParkingLot getParkingLot() {
-            return parkingLot;
-        }
-
-        public double getScore() {
-            return score;
-        }
     }
 }

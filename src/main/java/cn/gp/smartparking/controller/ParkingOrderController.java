@@ -120,11 +120,27 @@ public class ParkingOrderController {
 
     @Operation(summary = "获取用户订单列表")
     @GetMapping("/user")
-    public Result<List<ParkingOrder>> getUserOrders(@RequestParam Long userId) {
-        List<ParkingOrder> orders = parkingOrderService.lambdaQuery()
-                .eq(ParkingOrder::getUserId, userId)
-                .orderByDesc(ParkingOrder::getCreateTime)
-                .list();
+    public Result<List<ParkingOrder>> getUserOrders(
+            @RequestParam Long userId,
+            @RequestParam(required = false) String sortField,
+            @RequestParam(required = false) String sortOrder) {
+        
+        // 构建查询条件
+        var queryWrapper = parkingOrderService.lambdaQuery()
+                .eq(ParkingOrder::getUserId, userId);
+        
+        // 处理排序
+        if (sortField != null && !sortField.isEmpty()) {
+            // 将驼峰命名转换为下划线命名
+            String dbField = camelToUnderscore(sortField);
+            String orderSql = "ascend".equals(sortOrder) ? "ASC" : "DESC";
+            queryWrapper.last("ORDER BY " + dbField + " " + orderSql);
+        } else {
+            // 默认按创建时间降序
+            queryWrapper.orderByDesc(ParkingOrder::getCreateTime);
+        }
+        
+        List<ParkingOrder> orders = queryWrapper.list();
         
         // 处理订单数据
         Date now = new Date();
@@ -153,6 +169,25 @@ public class ParkingOrderController {
         }
         
         return Result.success("获取用户订单列表成功", orders);
+    }
+    
+    /**
+     * 驼峰命名转下划线命名
+     */
+    private String camelToUnderscore(String camelCase) {
+        if (camelCase == null || camelCase.isEmpty()) {
+            return camelCase;
+        }
+        StringBuilder underscore = new StringBuilder();
+        for (int i = 0; i < camelCase.length(); i++) {
+            char c = camelCase.charAt(i);
+            if (Character.isUpperCase(c)) {
+                underscore.append('_').append(Character.toLowerCase(c));
+            } else {
+                underscore.append(c);
+            }
+        }
+        return underscore.toString();
     }
 
     @Log(module = "订单管理", operation = "取消", description = "取消订单")

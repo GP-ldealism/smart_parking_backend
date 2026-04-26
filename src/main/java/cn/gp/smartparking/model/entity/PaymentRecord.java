@@ -17,7 +17,7 @@ import lombok.Data;
 @Data
 public class PaymentRecord implements Serializable {
     /**
-     * 
+     * ID
      */
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -25,7 +25,7 @@ public class PaymentRecord implements Serializable {
     /**
      * 订单ID
      */
-    private Long orderId;
+    private Long parkingOrderId;
 
     /**
      * 支付流水号
@@ -38,7 +38,7 @@ public class PaymentRecord implements Serializable {
     private BigDecimal amount;
 
     /**
-     * 0=微信 1=支付宝 2=余额
+     * 0=微信 1=支付宝 2=余额 3=其他
      */
     private Integer paymentMethod;
 
