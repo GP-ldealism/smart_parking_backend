@@ -106,14 +106,6 @@ public class CouponController {
                 .gt(Coupon::getEndTime, LocalDateTime.now()) // 未过期
                 .list();
         
-        // 添加通用券
-        List<Coupon> commonCoupons = couponService.lambdaQuery()
-                .isNull(Coupon::getUserId)
-                .eq(Coupon::getStatus, (byte) 0)
-                .gt(Coupon::getEndTime, LocalDateTime.now())
-                .list();
-        
-        coupons.addAll(commonCoupons);
         return Result.success("获取用户可用优惠券成功", coupons);
     }
 
@@ -311,15 +303,6 @@ public class CouponController {
         } catch (Exception e) {
             return Result.fail("优惠券推送失败: " + e.getMessage());
         }
-    }
-    
-    /**
-     * 生成随机优惠码
-     */
-    private String generateCouponCode() {
-        long timestamp = System.currentTimeMillis();
-        String timeSuffix = String.valueOf(timestamp).substring(String.valueOf(timestamp).length() - 6);
-        return "USER" + timeSuffix + (int)(Math.random() * 1000);
     }
 
     /**

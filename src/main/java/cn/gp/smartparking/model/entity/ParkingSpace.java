@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
@@ -32,7 +33,7 @@ public class ParkingSpace implements Serializable {
     private String spaceNo;
 
     /**
-     * 0=普通 1=新能源 2=VIP
+     * 0=普通 1=新能源 2=VIP 3=其他
      */
     private Integer type;
 
@@ -44,6 +45,7 @@ public class ParkingSpace implements Serializable {
     /**
      * 乐观锁
      */
+    @Version
     private Integer version;
 
     /**

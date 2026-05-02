@@ -46,9 +46,9 @@ public class AlipayController {
     @Operation(summary = "移动端APP支付 - 返回orderString")
     @PostMapping("/mobile/pay")
     @ResponseBody
-    public Result<String> mobilePay(@RequestParam Long orderId, @RequestParam Long parkingLotId) {
+    public Result<String> mobilePay(@RequestParam Long orderId, @RequestParam Long parkingLotId, @RequestParam(required = false) Long couponId) {
         try {
-            String orderString = payService.createMobilePayOrder(orderId, parkingLotId);
+            String orderString = payService.createMobilePayOrder(orderId, parkingLotId, couponId);
             if (orderString != null) {
                 return Result.success("获取APP支付订单成功", orderString);
             } else {

@@ -38,6 +38,26 @@ public class ParkingPrediction implements Serializable {
     private BigDecimal occupancyRate;
 
     /**
+     * 预测置信度 0-1
+     */
+    private BigDecimal confidence;
+
+    /**
+     * 模型版本
+     */
+    private String modelVersion;
+
+    /**
+     * 实际占用率（回填用）
+     */
+    private BigDecimal actualRate;
+
+    /**
+     * 预测误差
+     */
+    private BigDecimal errorRate;
+
+    /**
      * 乐观锁
      */
     private Integer version;

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
@@ -14,6 +15,7 @@ import lombok.Data;
  */
 @TableName(value ="user_plate")
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserPlate implements Serializable {
     /**
      * 

@@ -4,7 +4,7 @@
 spring:
   # 开发环境数据库配置
   datasource:
-    url: jdbc:mysql://localhost:3306/smart_parking_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/smart_parking_platform?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
     username: root
     password: dev_password_123
   

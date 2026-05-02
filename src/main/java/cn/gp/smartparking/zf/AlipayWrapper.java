@@ -6,10 +6,12 @@ import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradeQueryResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
+@Slf4j
 @Component
 public class AlipayWrapper {
 
@@ -20,7 +22,7 @@ public class AlipayWrapper {
     private static final String GATEWAY_URL = "https://openapi-sandbox.dl.alipaydev.com/gateway.do";
     private static final String FORMAT = "JSON";
     private static final String SIGN_TYPE = "RSA2";
-    private static final String NOTIFY_URL = "http://pb4d8db4.natappfree.cc/smart-parking/api/alipay/notify";
+    private static final String NOTIFY_URL = "http://vcb86389.natappfree.cc/smart-parking/api/alipay/notify";
     private static final String RETURN_URL_WEB = "http://localhost:9003/smart-parking/api/alipay/return";
     private static final String RETURN_URL_MOBILE = "http://localhost:9003/smart-parking/api/alipay/mobile/return";
 
@@ -63,9 +65,11 @@ public class AlipayWrapper {
 
         com.alipay.api.response.AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
         if (response.isSuccess()) {
+            log.debug("APP支付请求构建成功 - outTradeNo: " + outTradeNo + ", orderString: " + response.getBody());
             System.out.println("APP支付请求构建成功 - outTradeNo: " + outTradeNo + ", orderString: " + response.getBody());
             return response.getBody();
         } else {
+            log.debug("APP支付请求构建失败 - outTradeNo: " + outTradeNo + ", error: " + response.getMsg() + ", subError: " + response.getSubMsg());
             System.err.println("APP支付请求构建失败 - outTradeNo: " + outTradeNo + ", error: " + response.getMsg() + ", subError: " + response.getSubMsg());
             return null;
         }

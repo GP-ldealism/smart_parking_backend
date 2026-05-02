@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -78,39 +79,9 @@ public class ParkingOrder implements Serializable {
     private BigDecimal actualAmount;
 
     /**
-     * 0=待进场 1=已完成 2=已取消
+     * 0=默认（进行中） 1=已完成 2=已取消
      */
     private Integer status;
-
-    /**
-     * 实际进场时间
-     */
-    private Date actualStartTime;
-
-    /**
-     * 实际出场时间
-     */
-    private Date actualEndTime;
-
-    /**
-     * 实际停车时长
-     */
-    private Integer actualDurationMinutes;
-
-    /**
-     * 取消原因
-     */
-    private String cancelReason;
-
-    /**
-     * 取消时间
-     */
-    private Date cancelTime;
-
-    /**
-     * 关联支付记录ID
-     */
-    private Long paymentId;
 
     /**
      * 关联优惠券ID
@@ -135,11 +106,8 @@ public class ParkingOrder implements Serializable {
     /**
      * 乐观锁
      */
+    @Version
     private Integer version;
-
-    /**
-     * 创建人ID
-     */
     private Long createBy;
 
     /**

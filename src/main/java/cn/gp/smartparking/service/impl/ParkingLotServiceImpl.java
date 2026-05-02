@@ -7,7 +7,9 @@ import cn.gp.smartparking.service.ParkingLotService;
 import cn.gp.smartparking.service.ParkingSpaceService;
 import cn.gp.smartparking.mapper.ParkingLotMapper;
 import jakarta.annotation.Resource;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import java.util.concurrent.TimeUnit;
 
 /**
 * @author HeGuoping
@@ -21,8 +23,23 @@ public class ParkingLotServiceImpl extends ServiceImpl<ParkingLotMapper, Parking
     @Resource
     private ParkingSpaceService parkingSpaceService;
 
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
+    private static final String PARKING_LOT_CACHE_PREFIX = "smart_parking:parking_lot:";
+    private static final long CACHE_EXPIRE_MINUTES = 30;
+
     @Override
     public ParkingLot calculateSpaceStats(Long parkingLotId) {
+        String cacheKey = PARKING_LOT_CACHE_PREFIX + parkingLotId;
+        
+        // 先从Redis缓存获取
+        ParkingLot cachedLot = (ParkingLot) redisTemplate.opsForValue().get(cacheKey);
+        if (cachedLot != null) {
+            return cachedLot;
+        }
+        
+        // 缓存未命中，查询数据库
         ParkingLot parkingLot = this.getById(parkingLotId);
         if (parkingLot == null) {
             return null;
@@ -35,7 +52,6 @@ public class ParkingLotServiceImpl extends ServiceImpl<ParkingLotMapper, Parking
                 .count();
 
         // 动态计算空闲车位（从车位表统计）
-        // 统计空闲车位
         long freeSpace = parkingSpaceService.lambdaQuery()
                 .eq(ParkingSpace::getParkingLotId, parkingLotId)
                 .eq(ParkingSpace::getStatus, 1) // 1=空闲
@@ -44,6 +60,9 @@ public class ParkingLotServiceImpl extends ServiceImpl<ParkingLotMapper, Parking
 
         parkingLot.setTotalSpace((int) totalSpace);
         parkingLot.setFreeSpace((int) freeSpace);
+
+        // 写入Redis缓存，30分钟过期
+        redisTemplate.opsForValue().set(cacheKey, parkingLot, CACHE_EXPIRE_MINUTES, TimeUnit.MINUTES);
 
         return parkingLot;
     }
@@ -73,6 +92,21 @@ public class ParkingLotServiceImpl extends ServiceImpl<ParkingLotMapper, Parking
                 parkingLot.setFreeSpace((int) freeSpace);
             }
         }
+    }
+
+    /**
+     * 清除停车场缓存
+     */
+    public void clearParkingLotCache(Long parkingLotId) {
+        String cacheKey = PARKING_LOT_CACHE_PREFIX + parkingLotId;
+        redisTemplate.delete(cacheKey);
+    }
+
+    /**
+     * 清除所有停车场缓存
+     */
+    public void clearAllParkingLotCache() {
+        redisTemplate.delete(redisTemplate.keys(PARKING_LOT_CACHE_PREFIX + "*"));
     }
 }
 

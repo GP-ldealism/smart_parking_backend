@@ -42,39 +42,9 @@ public class UserPreference implements Serializable {
     private Integer preferType;
 
     /**
-     * 价格偏好区间（如：0-5,5-10）
-     */
-    private String preferPriceRange;
-
-    /**
-     * 偏好时段（如：早高峰、晚高峰）
-     */
-    private String preferTimeSlot;
-
-    /**
-     * 偏好设施（充电桩、监控等）
-     */
-    private String preferFacilities;
-
-    /**
-     * 最后更新时间
-     */
-    private Date lastUpdateTime;
-
-    /**
-     * 偏好更新次数
-     */
-    private Integer updateCount;
-
-    /**
      * 乐观锁
      */
     private Integer version;
-
-    /**
-     * 创建人ID
-     */
-    private Long createBy;
 
     /**
      * 创建时间

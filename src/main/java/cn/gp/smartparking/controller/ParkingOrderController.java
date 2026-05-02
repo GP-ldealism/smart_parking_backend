@@ -116,6 +116,12 @@ public class ParkingOrderController {
                 long durationMillis = endTimeMillis - order.getStartTime().getTime();
                 int durationMinutes = (int) (durationMillis / (60 * 1000));
                 order.setDurationMinutes(durationMinutes);
+                
+                // 如果订单进行中（status=0且endTime为null），计算当前费用（只返回不更新数据库）
+                if (order.getStatus() == 0 && order.getEndTime() == null) {
+                    double amount = calculateAmount(order.getStartTime(), now, order.getParkingLotId());
+                    order.setAmount(java.math.BigDecimal.valueOf(amount));
+                }
             }
         }
         return Result.success("获取订单详情成功", order);
@@ -168,6 +174,12 @@ public class ParkingOrderController {
                 long durationMillis = endTimeMillis - order.getStartTime().getTime();
                 int durationMinutes = (int) (durationMillis / (60 * 1000));
                 order.setDurationMinutes(durationMinutes);
+                
+                // 如果订单进行中（status=0且endTime为null），计算当前费用（只返回不更新数据库）
+                if (order.getStatus() == 0 && order.getEndTime() == null) {
+                    double amount = calculateAmount(order.getStartTime(), now, order.getParkingLotId());
+                    order.setAmount(java.math.BigDecimal.valueOf(amount));
+                }
             }
         }
         
@@ -348,9 +360,9 @@ public class ParkingOrderController {
         // 每个完整24小时周期按封顶价格计算
         totalAmount += full24HourPeriods * dailyCap;
 
-        // 剩余不足24小时的部分按小时计算
-        if (remainingMinutes > 30) {
-            int remainingHours = (int) Math.ceil((remainingMinutes - 30) / 60.0);
+        // 剩余不足24小时的部分按小时计算（不满1小时按1小时计算）
+        if (remainingMinutes > 0) {
+            int remainingHours = (int) Math.ceil(remainingMinutes / 60.0);
             double remainingAmount = remainingHours * hourlyRate;
             // 剩余部分也要封顶
             totalAmount += Math.min(remainingAmount, dailyCap);
