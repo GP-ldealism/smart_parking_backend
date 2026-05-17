@@ -10,7 +10,7 @@ set MYSQL_HOST=localhost
 set MYSQL_PORT=3306
 set MYSQL_USER=root
 set MYSQL_PASS=123456
-set DB_NAME=smart_parking
+set DB_NAME=smart_parking_platform
 
 echo 请输入MySQL连接参数（直接回车使用默认值）:
 echo --------------------------------------------------
@@ -36,8 +36,8 @@ echo   密码: %MYSQL_PASS%
 echo.
 
 set SCRIPT_DIR=%~dp0
-set CREATE_TABLE_SQL=%SCRIPT_DIR%create_table.sql
-set TEST_DATA_SQL=%SCRIPT_DIR%test_data.sql
+set CREATE_TABLE_SQL=%SCRIPT_DIR%createtable.sql
+set TEST_DATA_SQL=%SCRIPT_DIR%testdata.sql
 
 echo.
 echo [提示] 即将删除并重建数据库: %DB_NAME%
