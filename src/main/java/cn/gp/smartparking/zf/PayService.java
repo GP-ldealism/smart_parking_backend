@@ -302,7 +302,7 @@ public class PayService {
                 // 支付成功，更新订单状态、结束时间、实际支付金额
                 parkingOrderService.lambdaUpdate()
                         .eq(ParkingOrder::getId, order.getId())
-                        .set(ParkingOrder::getStatus, 1)
+                        .set(ParkingOrder::getStatus, status)
                         .set(ParkingOrder::getEndTime, new Date())
                         .set(ParkingOrder::getActualAmount, order.getActualAmount() != null ? order.getActualAmount() : order.getAmount())
                         .update();

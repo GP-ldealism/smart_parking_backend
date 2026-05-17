@@ -1,9 +1,10 @@
 package cn.gp.smartparking.zf;
 
+import cn.gp.smartparking.config.AlipayProperties;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
+import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +23,11 @@ public class AlipayWrapper {
     private static final String GATEWAY_URL = "https://openapi-sandbox.dl.alipaydev.com/gateway.do";
     private static final String FORMAT = "JSON";
     private static final String SIGN_TYPE = "RSA2";
-    private static final String NOTIFY_URL = "http://vcb86389.natappfree.cc/smart-parking/api/alipay/notify";
-    private static final String RETURN_URL_WEB = "http://localhost:9003/smart-parking/api/alipay/return";
-    private static final String RETURN_URL_MOBILE = "http://localhost:9003/smart-parking/api/alipay/mobile/return";
-
     private com.alipay.api.AlipayClient alipayClient = null;
+    private final AlipayProperties alipayProperties;
 
-    public AlipayWrapper() {
+    public AlipayWrapper(AlipayProperties alipayProperties) {
+        this.alipayProperties = alipayProperties;
         initAlipayClient();
     }
 
@@ -38,8 +37,8 @@ public class AlipayWrapper {
 
     public String buildWebPayRequest(String outTradeNo, BigDecimal totalAmount, String subject, String body) throws AlipayApiException {
         AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
-        request.setReturnUrl(RETURN_URL_WEB);
-        request.setNotifyUrl(NOTIFY_URL);
+        request.setReturnUrl(alipayProperties.getReturnUrlWeb());
+        request.setNotifyUrl(alipayProperties.getNotifyUrl());
 
         String bizContent = String.format(
                 "{\"out_trade_no\":\"%s\",\"total_amount\":\"%.2f\",\"subject\":\"%s\",\"body\":\"%s\",\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}",
@@ -54,7 +53,7 @@ public class AlipayWrapper {
 
     public String buildAppPayRequest(String outTradeNo, BigDecimal totalAmount, String subject, String body) throws AlipayApiException {
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-        request.setNotifyUrl(NOTIFY_URL);
+        request.setNotifyUrl(alipayProperties.getNotifyUrl());
 
         // 关键修复：添加 product_code 参数
         String bizContent = String.format(

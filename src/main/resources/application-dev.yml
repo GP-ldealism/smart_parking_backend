@@ -1,30 +1,16 @@
+server:
+  port: 9003
+websocket:
+  port: 8081
 spring:
-  # 开发环境数据库配置
   datasource:
     url: jdbc:mysql://localhost:3306/smart_parking_platform?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
-  
-  # 开发环境Redis配置
   data:
     redis:
       host: localhost
       port: 6379
-      password:
-
-# 开发环境API密钥配置
-api:
-  # 支付宝沙箱环境
-  alipay:
-    app-id: your_dev_app_id
-    private-key: your_dev_private_key
-    public-key: your_dev_public_key
-    gateway-url: https://openapi.alipaydev.com/gateway.do
-  
-  # 高德地图API（开发环境）
-  amap:
-    key: your_dev_amap_key
-    web-api-key: your_dev_web_api_key
 
 # 开发环境日志配置
 logging:
@@ -33,8 +19,14 @@ logging:
     org.springframework.web: DEBUG
     org.springframework.security: DEBUG
 
-# 开发环境WebSocket配置（调试用）
-websocket:
-  port: 8082  # 开发环境使用不同端口避免冲突
-server:
-  port: 20000
+# 支付宝支付
+payment:
+  alipay:
+    notify-url: http://nc478447.natappfree.cc/smart-parking/api/alipay/notify
+    return-url-web: http://localhost:9003/smart-parking/api/alipay/return
+    return-url-mobile: http://localhost:9003/smart-parking/api/alipay/mobile/return
+    web-pay-url: http://localhost:9003/smart-parking/api/alipay/web/pay
+    frontend-success-url: http://localhost:5173/
+    frontend-fail-url: http://localhost:5173/payfail
+
+

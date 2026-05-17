@@ -2,6 +2,7 @@ package cn.gp.smartparking.controller;
 
 import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
+import cn.gp.smartparking.config.AlipayProperties;
 import cn.gp.smartparking.model.dto.ParkingRecordDTO;
 import cn.gp.smartparking.model.entity.ParkingLot;
 import cn.gp.smartparking.model.entity.ParkingOrder;
@@ -46,6 +47,9 @@ public class ParkingOrderController {
 
     @Resource
     private cn.gp.smartparking.service.ParkingLotService parkingLotEntityService;
+
+    @Resource
+    private AlipayProperties alipayProperties;
 
     @Log(module = "订单管理", operation = "创建", description = "创建停车订单")
     @Operation(summary = "创建停车订单")
@@ -318,7 +322,7 @@ public class ParkingOrderController {
         parkingOrderService.updateById(order);
 
         // 返回支付宝支付页面URL
-        String payUrl = "http://localhost:9003/smart-parking/api/alipay/web/pay?orderId=" + id + "&parkingLotId=" + order.getParkingLotId();
+        String payUrl = alipayProperties.getWebPayUrl() + "?orderId=" + id + "&parkingLotId=" + order.getParkingLotId();
         if (couponId != null) {
             payUrl += "&couponId=" + couponId;
         }

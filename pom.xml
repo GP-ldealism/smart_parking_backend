@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -144,18 +144,18 @@
 <!--            <version>4.3.2</version>-->
 <!--            <type>pom</type>-->
 <!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.tribuo</groupId>-->
-<!--            <artifactId>tribuo-regression-slm</artifactId>-->
-<!--            <version>4.3.2</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.tribuo</groupId>
+            <artifactId>tribuo-regression-slm</artifactId>
+            <version>4.3.2</version>
+        </dependency>
 
         <!-- 另外，回归核心模块也建议加上 -->
-<!--        <dependency>-->
-<!--            <groupId>org.tribuo</groupId>-->
-<!--            <artifactId>tribuo-regression-core</artifactId>-->
-<!--            <version>4.3.2</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.tribuo</groupId>
+            <artifactId>tribuo-regression-core</artifactId>
+            <version>4.3.2</version>
+        </dependency>
 
         <!-- Netty WebSocket 依赖 -->
         <dependency>
@@ -194,7 +194,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.1</version>
                 <configuration>
                     <mainClass>cn.gp.smartparking.SmartParkingCloudPlatformApplication</mainClass>
                     <classifier>spring-boot</classifier>
@@ -205,13 +205,6 @@
                         </exclude>
                     </excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

@@ -2,6 +2,7 @@ package cn.gp.smartparking.zf;
 
 import cn.gp.smartparking.annotation.Log;
 import cn.gp.smartparking.common.Result;
+import cn.gp.smartparking.config.AlipayProperties;
 import com.alipay.api.AlipayApiException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,6 +22,9 @@ public class AlipayController {
 
     @Resource
     private PayService payService;
+
+    @Resource
+    private AlipayProperties alipayProperties;
 
     @Log(module = "支付管理", operation = "支付", description = "Web端支付")
     @Operation(summary = "Web端支付 - 返回HTML表单")
@@ -110,14 +114,12 @@ public class AlipayController {
             log.info("交易状态: {}", tradeStatus);
 
             if ("TRADE_SUCCESS".equals(tradeStatus) || "TRADE_FINISHED".equals(tradeStatus)) {
-//                return "redirect:http://localhost:9003/#/paysuccess?tradeNo=" + out_trade_no;
-                return "redirect:http://localhost:5173/";
+                return "redirect:" + alipayProperties.getFrontendSuccessUrl();
             }
         } catch (Exception e) {
             log.error("处理支付回调异常", e);
         }
-//        return "redirect:http://localhost:9003/#/payfail";
-        return "redirect:http://localhost:5173/payfail";
+        return "redirect:" + alipayProperties.getFrontendFailUrl();
     }
 
 }
