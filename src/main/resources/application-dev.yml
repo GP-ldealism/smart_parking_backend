@@ -1,19 +1,16 @@
-# 开发环境配置
-# 用于覆盖主配置文件中的敏感信息或环境特定配置
-
 spring:
   # 开发环境数据库配置
   datasource:
     url: jdbc:mysql://localhost:3306/smart_parking_platform?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
     username: root
-    password: dev_password_123
+    password: 123456
   
   # 开发环境Redis配置
   data:
     redis:
       host: localhost
       port: 6379
-      password: dev_redis_password
+      password:
 
 # 开发环境API密钥配置
 api:
@@ -39,3 +36,5 @@ logging:
 # 开发环境WebSocket配置（调试用）
 websocket:
   port: 8082  # 开发环境使用不同端口避免冲突
+server:
+  port: 20000

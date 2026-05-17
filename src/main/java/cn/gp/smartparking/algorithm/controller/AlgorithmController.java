@@ -81,6 +81,7 @@ public class AlgorithmController {
         ));
     }
 
+    @Deprecated
     @PostMapping("/data/generate")
     public Result<String> generateHistoricalData(@RequestParam(defaultValue = "30") Integer days) {
         try {
@@ -91,6 +92,7 @@ public class AlgorithmController {
         }
     }
 
+    @Deprecated
     @PostMapping("/data/initialize")
     public Result<String> initializeData() {
         try {

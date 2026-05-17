@@ -1,5 +1,5 @@
 server:
-  port: 9003
+  port: 10101
   servlet:
     context-path: /smart-parking # 接口前缀
 
@@ -12,12 +12,14 @@ spring:
     url: jdbc:mysql://localhost:3306/smart_parking_platform?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
+#    username: smart_parking_platform
+#    password: mrWGz2WjaPammas4
   # Redis配置
   data:
     redis:
       host: localhost
       port: 6379
-      password:
+#      password: OmXQGSyitwuI
   # 定时任务配置
   task:
     scheduling:
@@ -52,7 +54,7 @@ knife4j:
 # WebSocket 配置
 websocket:
   # Netty WebSocket 服务器端口
-  port: 8081
+  port: 10102
   # WebSocket 路径
   path: /websocket
   # 心跳配置
