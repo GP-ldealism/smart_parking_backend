@@ -1,5 +1,6 @@
 package cn.gp.smartparking.controller;
 
+import cn.gp.smartparking.algorithm.ParkingOccupancyPredictorService;
 import cn.gp.smartparking.common.Result;
 import cn.gp.smartparking.model.dto.RecommendationResultDTO;
 import cn.gp.smartparking.model.entity.ParkingLot;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -36,6 +38,9 @@ public class RecommendationController {
 
     @Resource
     private UserPreferenceService userPreferenceService;
+
+    @Resource
+    private ParkingOccupancyPredictorService predictorService;
 
     @Operation(summary = "基于用户偏好的车位推荐")
     @GetMapping("/parkingLots")
@@ -104,27 +109,31 @@ public class RecommendationController {
     }
 
     /**
-     * 计算推荐分数（加权评分算法）
+     * 计算推荐分数（加权评分算法 - 集成AI预测）
      */
     private double calculateRecommendationScore(ParkingLot lot, Double longitude, Double latitude, UserPreference preference) {
         double score = 0.0;
 
-        // 1. 距离因素（50%权重）- 提高距离权重
+        // 1. 距离因素（35%权重）
         double distanceScore = calculateDistanceScore(lot, longitude, latitude);
-        score += distanceScore * 0.5;
+        score += distanceScore * 0.35;
 
         // 2. 空闲车位因素（25%权重）
         double freeSpaceScore = calculateFreeSpaceScore(lot);
         score += freeSpaceScore * 0.25;
 
-        // 3. 价格因素（15%权重）
+        // 3. AI预测因素（20%权重）- 基于未来24小时预测
+        double predictionScore = calculatePredictionScore(lot);
+        score += predictionScore * 0.20;
+
+        // 4. 价格因素（15%权重）
         double priceScore = calculatePriceScore(lot);
         score += priceScore * 0.15;
 
-        // 4. 用户偏好因素（10%权重）
+        // 5. 用户偏好因素（5%权重）
         if (preference != null) {
             double preferenceScore = calculatePreferenceScore(lot, preference);
-            score += preferenceScore * 0.1;
+            score += preferenceScore * 0.05;
         }
 
         return score;
@@ -253,10 +262,51 @@ public class RecommendationController {
      */
     private double calculatePreferenceScore(ParkingLot lot, UserPreference preference) {
         double score = 0.0;
-        
+
         // 根据用户偏好的车位类型进行匹配
         // 这里简化处理，实际应该查询该停车场是否有用户偏好的车位类型
-        
+
         return score;
+    }
+
+    /**
+     * 计算AI预测分数（基于未来24小时预测）
+     */
+    private double calculatePredictionScore(ParkingLot lot) {
+        try {
+            LocalDateTime startTime = LocalDateTime.now().plusHours(1);
+            var predictions = predictorService.predictEnsemble(lot.getId(), startTime, 24);
+
+            if (predictions != null && predictions.getEnsembleResults() != null) {
+                // 计算未来24小时平均预测占用率
+                double avgOccupancy = predictions.getEnsembleResults().stream()
+                        .mapToDouble(p -> p.getOccupancyRate().doubleValue())
+                        .average()
+                        .orElse(0.5);
+
+                // 占用率越低，分数越高
+                // 0-30%: 1.0分
+                // 30-50%: 0.8分
+                // 50-70%: 0.6分
+                // 70-85%: 0.4分
+                // 85%+: 0.2分
+                if (avgOccupancy < 0.30) {
+                    return 1.0;
+                } else if (avgOccupancy < 0.50) {
+                    return 0.8;
+                } else if (avgOccupancy < 0.70) {
+                    return 0.6;
+                } else if (avgOccupancy < 0.85) {
+                    return 0.4;
+                } else {
+                    return 0.2;
+                }
+            }
+        } catch (Exception e) {
+            log.warn("计算预测分数失败，停车场ID: {}, 错误: {}", lot.getId(), e.getMessage());
+        }
+
+        // 如果预测失败，返回中等分数
+        return 0.5;
     }
 }
